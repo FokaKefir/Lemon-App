@@ -1,4 +1,4 @@
-package com.example.lemon_app.fragment;
+package com.example.lemon_app.gui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.lemon_app.R;
 
-public class HomeFragment extends Fragment {
+public class TemplateFragment extends Fragment {
 
     // region 0. Constants
 
@@ -26,7 +26,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_template, container, false);
     }
 
     // endregion

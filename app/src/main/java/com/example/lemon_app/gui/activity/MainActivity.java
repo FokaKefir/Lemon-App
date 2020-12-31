@@ -1,4 +1,4 @@
-package com.example.lemon_app.activity;
+package com.example.lemon_app.gui.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,10 +8,10 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.example.lemon_app.fragment.HomeFragment;
-import com.example.lemon_app.fragment.NotificationsFragment;
+import com.example.lemon_app.gui.fragment.HomeFragment;
+import com.example.lemon_app.gui.fragment.NotificationsFragment;
 import com.example.lemon_app.R;
-import com.example.lemon_app.fragment.UserFragment;
+import com.example.lemon_app.gui.fragment.UserFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{

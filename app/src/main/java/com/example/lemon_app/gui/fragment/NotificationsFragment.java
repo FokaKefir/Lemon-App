@@ -1,4 +1,4 @@
-package com.example.lemon_app.fragment;
+package com.example.lemon_app.gui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
