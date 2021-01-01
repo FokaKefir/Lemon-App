@@ -17,38 +17,29 @@ import java.util.ArrayList;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
+    // region 1. Delc and Init
+
     private ArrayList<Post> posts;
+    private OnPostListener onPostListener;
 
-    public static class PostViewHolder extends RecyclerView.ViewHolder {
+    // endregion
 
-        public ImageView image;
-        public TextView txtAuthor;
-        public TextView txtDate;
-        public TextView txtDescription;
-        public TextView txtLikes;
-        public TextView txtComments;
+    // region 2. Constructor
 
-        public PostViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            this.image = itemView.findViewById(R.id.img_post);
-            this.txtAuthor = itemView.findViewById(R.id.txt_author);
-            this.txtDate = itemView.findViewById(R.id.txt_date);
-            this.txtDescription = itemView.findViewById(R.id.txt_description);
-            this.txtLikes = itemView.findViewById(R.id.txt_likes);
-            this.txtComments = itemView.findViewById(R.id.txt_comments);
-        }
-    }
-
-    public PostAdapter(ArrayList<Post> posts) {
+    public PostAdapter(ArrayList<Post> posts, OnPostListener onPostListener) {
         this.posts = posts;
+        this.onPostListener = onPostListener;
     }
+
+    // endregion
+
+    // region 3. Adapter
 
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.example_post, parent, false);
-        PostViewHolder viewHolder = new PostViewHolder(v);
+        PostViewHolder viewHolder = new PostViewHolder(v, this.onPostListener);
 
         return viewHolder;
     }
@@ -70,4 +61,50 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public int getItemCount() {
         return posts.size();
     }
+
+    // endregion
+
+    // region 4. Holder class
+
+    public static class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        public ImageView image;
+        public TextView txtAuthor;
+        public TextView txtDate;
+        public TextView txtDescription;
+        public TextView txtLikes;
+        public TextView txtComments;
+
+        private OnPostListener onPostListener;
+
+        public PostViewHolder(@NonNull View itemView, OnPostListener onPostListener) {
+            super(itemView);
+
+            this.image = itemView.findViewById(R.id.img_post);
+            this.txtAuthor = itemView.findViewById(R.id.txt_author);
+            this.txtDate = itemView.findViewById(R.id.txt_date);
+            this.txtDescription = itemView.findViewById(R.id.txt_description);
+            this.txtLikes = itemView.findViewById(R.id.txt_likes);
+            this.txtComments = itemView.findViewById(R.id.txt_comments);
+
+            this.onPostListener = onPostListener;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            this.onPostListener.onPostListener(getAdapterPosition());
+        }
+    }
+
+    // endregion
+
+    // region 5. Listener interface
+
+    public interface OnPostListener {
+        void onPostListener(int position);
+    }
+
+    // endregion
+
 }
