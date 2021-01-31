@@ -28,10 +28,10 @@ public class PostActivity extends AppCompatActivity {
         this.setContentView(R.layout.post_activity);
 
         Intent intent = getIntent();
-        int position = intent.getIntExtra("Position", 0);
+        int id = intent.getIntExtra("id", 0);
 
         TextView textView = findViewById(R.id.txt_post_pos);
-        textView.setText(String.valueOf(position));
+        textView.setText(String.valueOf(id));
 
     }
 

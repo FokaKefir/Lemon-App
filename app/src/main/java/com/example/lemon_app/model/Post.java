@@ -7,7 +7,8 @@ public class Post {
 
     // region 1. Decl and Init
 
-    private int image;
+    private int id;
+    private String image;
     private String author;
     private String date;
     private String description;
@@ -18,7 +19,8 @@ public class Post {
 
     // region 2. Constructor
 
-    public Post(int image, String author, String date, String description, int numberOfLikes, int numberOfComments) {
+    public Post(int id, String image, String author, String date, String description, int numberOfLikes, int numberOfComments) {
+        this.id = id;
         this.image = image;
         this.author = author;
         this.date = date;
@@ -31,7 +33,11 @@ public class Post {
 
     // region 3. Getters and Setters
 
-    public int getImage() {
+    public int getId() {
+        return id;
+    }
+
+    public String getImage() {
         return image;
     }
 
@@ -53,30 +59,6 @@ public class Post {
 
     public int getNumberOfComments() {
         return numberOfComments;
-    }
-
-    public void setImage(int image) {
-        this.image = image;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setNumberOfLikes(int numberOfLikes) {
-        this.numberOfLikes = numberOfLikes;
-    }
-
-    public void setNumberOfComments(int numberOfComments) {
-        this.numberOfComments = numberOfComments;
     }
 
     // endregion

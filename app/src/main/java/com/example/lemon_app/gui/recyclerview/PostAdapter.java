@@ -1,6 +1,7 @@
 package com.example.lemon_app.gui.recyclerview;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.lemon_app.R;
 import com.example.lemon_app.model.Post;
 
@@ -21,14 +23,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     private ArrayList<Post> posts;
     private OnPostListener onPostListener;
+    private Context context;
 
     // endregion
 
     // region 2. Constructor
 
-    public PostAdapter(ArrayList<Post> posts, OnPostListener onPostListener) {
+    public PostAdapter(ArrayList<Post> posts, OnPostListener onPostListener, Context context) {
         this.posts = posts;
         this.onPostListener = onPostListener;
+        this.context = context;
     }
 
     // endregion
@@ -49,12 +53,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         Post currentPost = this.posts.get(position);
 
-        holder.image.setImageResource(currentPost.getImage());
+        holder.id = currentPost.getId();
         holder.txtAuthor.setText(currentPost.getAuthor());
         holder.txtDate.setText(currentPost.getDate());
         holder.txtDescription.setText(currentPost.getDescription());
         holder.txtLikes.setText(currentPost.getNumberOfLikes() + " likes");
         holder.txtComments.setText(currentPost.getNumberOfComments() + " comments");
+        Glide.with(this.context).load(currentPost.getImage()).into(holder.image);
     }
 
     @Override
@@ -68,6 +73,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     public static class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        public int id;
         public ImageView image;
         public TextView txtAuthor;
         public TextView txtDate;
@@ -93,7 +99,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         @Override
         public void onClick(View view) {
-            this.onPostListener.onPostListener(getAdapterPosition());
+            this.onPostListener.onPostListener(this.id);
         }
     }
 
