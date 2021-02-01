@@ -1,11 +1,14 @@
 package com.example.lemon_app.logic.listener;
 
 import android.content.Intent;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.example.lemon_app.R;
+import com.example.lemon_app.gui.activity.CreatePostActivity;
+import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.activity.PostActivity;
 import com.example.lemon_app.gui.fragment.HomeFragment;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
@@ -17,7 +20,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class HomeFragmentListener implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String> {
+public class HomeFragmentListener implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
 
     // region 1. Decl and Init
 
@@ -77,6 +80,17 @@ public class HomeFragmentListener implements PostAdapter.OnPostListener, Respons
     @Override
     public void onErrorResponse(VolleyError error) {
         Toast.makeText(this.fragment.getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+    
+    // endregion
+    
+    // region 5. Floating button listener
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this.fragment.getActivity(), CreatePostActivity.class);
+        intent.putExtra("userID", MainActivity.getUserID());
+        this.fragment.startActivity(intent);
     }
 
     // endregion

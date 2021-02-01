@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private BottomNavigationView bottomNav;
 
+    private static int userID;
+
     // endregion
 
     // region 2. Lifecycle
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.main_activity);
+
+        this.userID = 1;
 
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
@@ -66,6 +70,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return true;
         }
         return false;
+    }
+
+    // endregion
+
+    // region 4. Getters and Setters
+
+    public static int getUserID() {
+        return userID;
     }
 
     // endregion

@@ -24,6 +24,7 @@ import com.example.lemon_app.gui.activity.PostActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
 import com.example.lemon_app.logic.listener.HomeFragmentListener;
 import com.example.lemon_app.model.Post;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -31,7 +32,7 @@ public class HomeFragment extends Fragment {
 
     // region 0. Constants
 
-    private static final String POSTS_URL = "http://192.168.1.3/lemon_app/api.php";
+    private static final String POSTS_URL = "http://192.168.1.3/lemon_app/posts.php";
 
     // endregion
 
@@ -43,6 +44,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+
+    private FloatingActionButton fabAddPost;
 
     private ArrayList<Post> posts;
 
@@ -57,7 +60,12 @@ public class HomeFragment extends Fragment {
 
         this.listener = new HomeFragmentListener(this);
 
-        loadPosts();
+        this.fabAddPost = this.view.findViewById(R.id.fab_add_post);
+        this.fabAddPost.setOnClickListener(this.listener);
+
+        this.posts = new ArrayList<>();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, POSTS_URL, this.listener, this.listener);
+        Volley.newRequestQueue(getContext()).add(stringRequest);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_post);
         this.recyclerView.setHasFixedSize(true);
@@ -71,21 +79,7 @@ public class HomeFragment extends Fragment {
 
     // endregion
 
-    // region 3. Loading posts
-
-    private void loadPosts() {
-        this.posts = new ArrayList<>();
-        this.posts.add(new Post(10, String.valueOf(R.drawable.kep), "Jani", "2020. 12. 31.", "Szep kep", 1, 2));
-        this.posts.add(new Post(20, String.valueOf(R.drawable.ic_baseline_notifications_24), "Tamas", "2000. 8. 2.", "Sokat dolgoztam vele", 0, 0));
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, POSTS_URL, this.listener, this.listener);
-        Volley.newRequestQueue(getContext()).add(stringRequest);
-
-    }
-
-    // endregion
-
-    // region 4. Getters and Setters
+    // region 3. Getters and Setters
 
     public void setPosts(ArrayList<Post> posts) {
         this.posts = posts;
