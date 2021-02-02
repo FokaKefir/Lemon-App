@@ -32,6 +32,7 @@ public class HomeFragment extends Fragment {
 
     // region 0. Constants
 
+    // TODO Change the URL
     private static final String POSTS_URL = "http://192.168.1.3/lemon_app/posts.php";
 
     // endregion
