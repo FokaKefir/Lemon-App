@@ -5,10 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.lemon_app.R;
-import com.example.lemon_app.gui.fragment.HomeFragment;
 
 public class PostActivity extends AppCompatActivity {
 
@@ -25,7 +23,7 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.post_activity);
+        this.setContentView(R.layout.activity_post);
 
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", 0);

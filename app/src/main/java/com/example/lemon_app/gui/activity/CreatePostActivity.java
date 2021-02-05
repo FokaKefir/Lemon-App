@@ -21,7 +21,7 @@ public class CreatePostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_post_activity);
+        setContentView(R.layout.activity_create_post);
     }
 
     // endregion
