@@ -6,8 +6,12 @@ import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.lemon_app.gui.fragment.HomeFragment;
 import com.example.lemon_app.gui.fragment.NotificationsFragment;
@@ -24,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     // region 1. Decl and Init
 
     private BottomNavigationView bottomNav;
+    private MenuItem mnuLogout;
 
     private static int userId;
 
@@ -41,10 +46,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             userId = bundle.getInt("id");
         }
 
+        this.mnuLogout = findViewById(R.id.mnu_logout);
+
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
 
         this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.logout_menu, menu);
+        return true;
     }
 
     // endregion
@@ -77,7 +91,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     // endregion
 
-    // region 4. Getters and Setters
+    // region 4. Toolbar Menu item
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.mnu_logout) {
+            SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.SHARED_PREFS, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // endregion
+
+    // region 5. Getters and Setters
 
     public static int getUserId() {
         return userId;
