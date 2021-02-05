@@ -11,19 +11,15 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.SyncStateContract;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
@@ -39,7 +35,6 @@ import net.gotev.uploadservice.UploadService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -51,7 +46,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // TODO Change the URL
     private static final String REGISTER_REQUEST_URL = "http://192.168.1.3/lemon_app/register.php";
-    private static final String UPLOAD_IMAGE_URL = "http://192.168.1.3/lemon_app/upload_image.php";
+    private static final String UPLOAD_IMAGE_REQUEST_URL = "http://192.168.1.3/lemon_app/upload_image.php";
     private static final String IMAGE_URL = "http://192.168.1.3/lemon_app/images/";
 
     private static final String SAMPLE_IMAGE = "sample_profile_image";
@@ -269,14 +264,13 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
             return;
         }
 
-        RequestQueue queue = Volley.newRequestQueue(RegisterUserActivity.this);
         Map<String, String> params = new HashMap<>();
         params.put("name", strName);
         params.put("password", strPassword);
         params.put("email", strEmail);
         params.put("image", IMAGE_URL + this.strImage + ".jpg");
         DataRequest dataRequest = new DataRequest(params, REGISTER_REQUEST_URL, this, this);
-        queue.add(dataRequest);
+        Volley.newRequestQueue(RegisterUserActivity.this).add(dataRequest);
     }
 
     private void uploadImage() {
@@ -286,7 +280,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
             String uploadId = UUID.randomUUID().toString();
 
             //Creating a multi part request
-            new MultipartUploadRequest(this, uploadId, UPLOAD_IMAGE_URL)
+            new MultipartUploadRequest(this, uploadId, UPLOAD_IMAGE_REQUEST_URL)
                     .addFileToUpload(path, "image")
                     .addParameter("name", this.strImage)
                     .setNotificationConfig(new UploadNotificationConfig())

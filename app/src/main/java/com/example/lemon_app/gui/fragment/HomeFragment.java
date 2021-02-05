@@ -1,14 +1,9 @@
 package com.example.lemon_app.gui.fragment;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,24 +11,25 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
-import com.example.lemon_app.gui.activity.PostActivity;
+import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
+import com.example.lemon_app.logic.database.DataRequest;
 import com.example.lemon_app.logic.listener.HomeFragmentListener;
 import com.example.lemon_app.model.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
     // region 0. Constants
 
     // TODO Change the URL
-    private static final String POSTS_URL = "http://192.168.1.3/lemon_app/posts.php";
+    private static final String POSTS_REQUEST_URL = "http://192.168.1.3/lemon_app/posts.php";
 
     // endregion
 
@@ -65,8 +61,11 @@ public class HomeFragment extends Fragment {
         this.fabAddPost.setOnClickListener(this.listener);
 
         this.posts = new ArrayList<>();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, POSTS_URL, this.listener, this.listener);
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(MainActivity.getUserId()));
+        DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this.listener, this.listener);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_post);
         this.recyclerView.setHasFixedSize(true);
@@ -77,6 +76,7 @@ public class HomeFragment extends Fragment {
 
         return this.view;
     }
+
 
     // endregion
 

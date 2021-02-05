@@ -97,12 +97,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // region 4. Login
 
     private void login() {
-        RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
         Map<String, String> params = new HashMap<>();
         params.put("name", this.strName);
         params.put("password", this.strPassword);
         DataRequest dataRequest = new DataRequest(params, LOGIN_REQUEST_URL, this, this);
-        queue.add(dataRequest);
+        Volley.newRequestQueue(LoginActivity.this).add(dataRequest);
     }
 
     // endregion
