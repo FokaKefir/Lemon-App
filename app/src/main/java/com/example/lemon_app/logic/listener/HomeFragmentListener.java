@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.example.lemon_app.R;
 import com.example.lemon_app.gui.activity.CreatePostActivity;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.activity.PostActivity;
@@ -89,7 +88,7 @@ public class HomeFragmentListener implements PostAdapter.OnPostListener, Respons
     @Override
     public void onClick(View view) {
         Intent intent = new Intent(this.fragment.getActivity(), CreatePostActivity.class);
-        intent.putExtra("userID", MainActivity.getUserID());
+        intent.putExtra("userID", MainActivity.getUserId());
         this.fragment.startActivity(intent);
     }
 

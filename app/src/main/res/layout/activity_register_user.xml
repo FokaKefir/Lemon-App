@@ -22,7 +22,6 @@
             android:inputType="text"
             android:background="@color/white"
             android:hint="Username" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -37,7 +36,6 @@
             android:inputType="textEmailAddress"
             android:background="@color/white"
             android:hint="Email" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -55,7 +53,6 @@
             android:inputType="textPassword"
             android:background="@color/white"
             android:hint="Password" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

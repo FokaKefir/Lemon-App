@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -51,8 +52,9 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
     // TODO Change the URL
     private static final String REGISTER_REQUEST_URL = "http://192.168.1.3/lemon_app/register.php";
     private static final String UPLOAD_IMAGE_URL = "http://192.168.1.3/lemon_app/upload_image.php";
-    private static final String SAMPLE_IMAGE_URL = "http://192.168.1.3/lemon_app/images/sample_profile_image.png";
     private static final String IMAGE_URL = "http://192.168.1.3/lemon_app/images/";
+
+    private static final String SAMPLE_IMAGE = "sample_profile_image";
 
     private static final int STORAGE_PERMISSION_CODE = 123;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -96,7 +98,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
         requestStoragePermission();
         this.filePath = null;
-        this.strImage = SAMPLE_IMAGE_URL;
+        this.strImage = SAMPLE_IMAGE;
 
         this.txtInputName = findViewById(R.id.txt_input_username);
         this.txtInputEmail = findViewById(R.id.txt_input_email);
@@ -108,12 +110,14 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
         this.btnChooseImage.setOnClickListener(this);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             this.filePath = data.getData();
+            this.btnChooseImage.setText("Choosed");
         }
     }
 
@@ -144,10 +148,10 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
             boolean success = jsonResponse.getBoolean("success");
 
             if (success) {
-                if (!this.strImage.equals(SAMPLE_IMAGE_URL)) {
+                if (!this.strImage.equals(SAMPLE_IMAGE)) {
                     uploadImage();
                 }
-                // TODO Go to login page
+                finish();
 
             } else {
                 String errorMessage = jsonResponse.getString("message");

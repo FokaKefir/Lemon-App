@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private BottomNavigationView bottomNav;
 
-    private static int userID;
+    private static int userId;
 
     // endregion
 
@@ -35,7 +36,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
 
-        this.userID = 1;
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null){
+            userId = bundle.getInt("id");
+        }
 
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
@@ -75,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     // region 4. Getters and Setters
 
-    public static int getUserID() {
-        return userID;
+    public static int getUserId() {
+        return userId;
     }
 
     // endregion

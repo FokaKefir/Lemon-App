@@ -12,18 +12,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LemonApp">
-        <activity android:name=".gui.activity.RegisterUserActivity">
+        <activity android:name=".gui.activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".gui.activity.RegisterUserActivity" />
         <activity android:name=".gui.activity.CreatePostActivity" />
         <activity android:name=".gui.activity.PostActivity" />
-        <activity android:name=".gui.activity.MainActivity">
-
-        </activity>
+        <activity android:name=".gui.activity.MainActivity" />
     </application>
 
 </manifest>
