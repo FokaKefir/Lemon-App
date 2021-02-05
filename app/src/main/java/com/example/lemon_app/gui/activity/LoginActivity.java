@@ -3,7 +3,9 @@ package com.example.lemon_app.gui.activity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +33,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // TODO change the URL
     private static final String LOGIN_REQUEST_URL = "http://192.168.1.3/lemon_app/login.php";
 
+    public static final String SHARED_PREFS = "login";
+    public static final String NAME = "name";
+    public static final String PASSWORD = "password";
+    public static final String ACCESS = "access";
+
     // endregion
 
     // region 1. Decl and Init
@@ -42,6 +49,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private Button btnLogin;
 
+    private String strName;
+    private String strPassword;
+
+    private int userId;
+    private Boolean access;
+
     // endregion
 
     // region 2. Lifecycle
@@ -51,6 +64,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        this.access = false;
+        loadData();
+
         this.txtInputName = findViewById(R.id.txt_input_login_username);
         this.txtInputPassword = findViewById(R.id.txt_input_login_password);
         this.txtRegister = findViewById(R.id.txt_register);
@@ -58,7 +74,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         this.txtRegister.setOnClickListener(this);
         this.btnLogin.setOnClickListener(this);
-
     }
 
     // endregion
@@ -68,6 +83,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btn_login) {
+            this.strName = this.txtInputName.getEditText().getText().toString().trim();
+            this.strPassword = this.txtInputPassword.getEditText().getText().toString().trim();
             login();
         } else if (view.getId() == R.id.txt_register) {
             Intent intent = new Intent(this, RegisterUserActivity.class);
@@ -80,13 +97,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // region 4. Login
 
     private void login() {
-        String strName = this.txtInputName.getEditText().getText().toString().trim();
-        String strPassword = this.txtInputPassword.getEditText().getText().toString().trim();
-
         RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
         Map<String, String> params = new HashMap<>();
-        params.put("name", strName);
-        params.put("password", strPassword);
+        params.put("name", this.strName);
+        params.put("password", this.strPassword);
         DataRequest dataRequest = new DataRequest(params, LOGIN_REQUEST_URL, this, this);
         queue.add(dataRequest);
     }
@@ -102,16 +116,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             boolean success = jsonResponse.getBoolean("success");
 
             if (success){
-                int userId = jsonResponse.getInt("id");
-                openMainActivity(userId);
+                this.userId = jsonResponse.getInt("id");
+                if (this.access) {
+                    openMainActivity();
+                } else {
+                    dialog();
+                }
 
-            } else {
+
+            } else if(!this.access) {
                 String errorMessage = jsonResponse.getString("message");
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(errorMessage)
                         .setNegativeButton("Retry", null)
                         .create().show();
+            } else {
+                this.txtInputName.getEditText().setText(this.strName);
+                this.access = false;
             }
 
         } catch (JSONException e) {
@@ -129,10 +151,59 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // region 6. Open MainActivity
 
-    private void openMainActivity(int userId) {
+    private void openMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("id", userId);
+        intent.putExtra("id", this.userId);
         startActivity(intent);
+        finish();
+
+    }
+
+    // endregion
+
+    // region 7. Save and load data
+
+    private void dialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Save login data")
+                .setMessage("Do you want to save login data?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveData();
+                        openMainActivity();
+
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        openMainActivity();
+                    }
+                })
+                .setIcon(R.drawable.ic_dialog_save)
+                .show();
+    }
+
+    private void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(NAME, this.strName);
+        editor.putString(PASSWORD, this.strPassword);
+        editor.putBoolean(ACCESS, true);
+        editor.apply();
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+
+        this.strName = sharedPreferences.getString(NAME, null);
+        this.strPassword = sharedPreferences.getString(PASSWORD, null);
+        this.access = sharedPreferences.getBoolean(ACCESS, false);
+
+        if (this.access) {
+            login();
+        }
+
     }
 
     // endregion
