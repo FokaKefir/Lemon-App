@@ -45,9 +45,9 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
     // region 0. Constants
 
     // TODO Change the URL
-    private static final String REGISTER_REQUEST_URL = "http://192.168.1.3/lemon_app/register.php";
-    private static final String UPLOAD_IMAGE_REQUEST_URL = "http://192.168.1.3/lemon_app/upload_image.php";
-    private static final String IMAGE_URL = "http://192.168.1.3/lemon_app/images/";
+    private static final String REGISTER_REQUEST_URL = "http://192.168.1.4/lemon_app/register.php";
+    private static final String UPLOAD_IMAGE_REQUEST_URL = "http://192.168.1.4/lemon_app/upload_image.php";
+    private static final String IMAGE_URL = "http://192.168.1.4/lemon_app/images/";
 
     private static final String SAMPLE_IMAGE = "sample_profile_image";
 
