@@ -45,9 +45,9 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
     // region 0. Constants
 
     // TODO Change the URL
-    private static final String REGISTER_REQUEST_URL = "http://192.168.1.4/lemon_app/register.php";
-    private static final String UPLOAD_IMAGE_REQUEST_URL = "http://192.168.1.4/lemon_app/upload_image.php";
-    private static final String IMAGE_URL = "http://192.168.1.4/lemon_app/images/";
+    private static final String REGISTER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/register.php";
+    private static final String UPLOAD_IMAGE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_image.php";
+    private static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
 
     private static final String SAMPLE_IMAGE = "sample_profile_image";
 
@@ -91,7 +91,6 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
-        requestStoragePermission();
         this.filePath = null;
         this.strImage = SAMPLE_IMAGE;
 
@@ -125,10 +124,11 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
         if (view.getId() == R.id.btn_register) {
             uploadUserData();
         } else if (view.getId() == R.id.btn_choose_image) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                chooseImageFromStorage();
+            } else {
+                requestStoragePermission();
+            }
         }
     }
 
@@ -241,6 +241,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Displaying a toast
                 Toast.makeText(this, "Permission granted now you can read the storage", Toast.LENGTH_LONG).show();
+                chooseImageFromStorage();
             } else {
                 //Displaying another toast if permission is not granted
                 Toast.makeText(this, "Oops you just denied the permission", Toast.LENGTH_LONG).show();
@@ -250,7 +251,18 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 8. Upload data
+    // region 8. Choose image from storage
+
+    private void chooseImageFromStorage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    // endregion
+
+    // region 9. Upload data
 
     private void uploadUserData() {
         String strName = this.txtInputName.getEditText().getText().toString().trim();

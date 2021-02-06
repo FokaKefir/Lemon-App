@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // region 0. Constants
 
     // TODO change the URL
-    private static final String LOGIN_REQUEST_URL = "http://192.168.1.4/lemon_app/login.php";
+    private static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/login.php";
 
     public static final String SHARED_PREFS = "login";
     public static final String NAME = "name";
