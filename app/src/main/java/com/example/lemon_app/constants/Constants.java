@@ -15,6 +15,8 @@ public class Constants {
     public static final String UPLOAD_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_post.php";
     public static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/login.php";
     public static final String POSTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/posts.php";
+
+    // Image URL
     public static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
 
 }
