@@ -25,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.BuildConfig;
 import com.example.lemon_app.R;
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.logic.database.DataRequest;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -44,15 +45,11 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // region 0. Constants
 
-    // TODO Change the URL
     private static final String REGISTER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/register.php";
     private static final String UPLOAD_IMAGE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_image.php";
     private static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
 
     private static final String SAMPLE_IMAGE = "sample_profile_image";
-
-    private static final int STORAGE_PERMISSION_CODE = 123;
-    private static final int PICK_IMAGE_REQUEST = 1;
 
     private static final Pattern PASSWORD_PATTERS =
             Pattern.compile("^" +
@@ -109,7 +106,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == Constants.PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             this.filePath = data.getData();
             this.btnChooseImage.setText("Choosed");
         }
@@ -223,19 +220,13 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
             return;
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            //If the user has denied the permission previously your code will come to this block
-            //Here you can explain why you need this permission
-            //Explain here why you need this permission
-        }
-        //And finally ask for the permission
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.STORAGE_PERMISSION_CODE);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //Checking the request code of our request
-        if (requestCode == STORAGE_PERMISSION_CODE) {
+        if (requestCode == Constants.STORAGE_PERMISSION_CODE) {
 
             //If permission is granted
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -257,7 +248,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), Constants.PICK_IMAGE_REQUEST);
     }
 
     // endregion

@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.logic.database.DataRequest;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -30,10 +31,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // region 0. Constants
 
-    // TODO change the URL
     private static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/login.php";
 
-    public static final String SHARED_PREFS = "login";
     public static final String NAME = "name";
     public static final String PASSWORD = "password";
     public static final String ACCESS = "access";
@@ -183,7 +182,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putString(NAME, this.strName);
@@ -193,7 +192,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, MODE_PRIVATE);
 
         this.strName = sharedPreferences.getString(NAME, null);
         this.strPassword = sharedPreferences.getString(PASSWORD, null);

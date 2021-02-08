@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.gui.fragment.HomeFragment;
 import com.example.lemon_app.gui.fragment.NotificationsFragment;
 import com.example.lemon_app.R;
@@ -26,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     // region 1. Decl and Init
 
     private BottomNavigationView bottomNav;
-    private MenuItem mnuLogout;
 
     private static int userId;
 
@@ -43,8 +43,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if (bundle != null){
             userId = bundle.getInt("id");
         }
-
-        this.mnuLogout = findViewById(R.id.mnu_logout);
 
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
@@ -94,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.mnu_logout) {
-            SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.SHARED_PREFS, MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.clear();
             editor.apply();

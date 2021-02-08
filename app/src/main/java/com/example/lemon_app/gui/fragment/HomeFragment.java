@@ -28,7 +28,6 @@ public class HomeFragment extends Fragment {
 
     // region 0. Constants
 
-    // TODO Change the URL
     private static final String POSTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/posts.php";
 
     // endregion
