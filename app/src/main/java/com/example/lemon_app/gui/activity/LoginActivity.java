@@ -12,13 +12,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
-import com.example.lemon_app.logic.database.DataRequest;
+import com.example.lemon_app.database.DataRequest;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -27,11 +26,13 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.lemon_app.constants.Constants.LOGIN_REQUEST_URL;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, Response.Listener<String>, Response.ErrorListener {
 
     // region 0. Constants
 
-    private static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/login.php";
+
 
     public static final String NAME = "name";
     public static final String PASSWORD = "password";

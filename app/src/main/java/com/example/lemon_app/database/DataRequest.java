@@ -1,4 +1,4 @@
-package com.example.lemon_app.logic.database;
+package com.example.lemon_app.database;
 
 
 import com.android.volley.Response;

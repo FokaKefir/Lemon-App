@@ -26,7 +26,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.BuildConfig;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
-import com.example.lemon_app.logic.database.DataRequest;
+import com.example.lemon_app.database.DataRequest;
 import com.google.android.material.textfield.TextInputLayout;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
@@ -41,13 +41,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import static com.example.lemon_app.constants.Constants.IMAGE_URL;
+import static com.example.lemon_app.constants.Constants.REGISTER_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.UPLOAD_IMAGE_REQUEST_URL;
+
 public class RegisterUserActivity extends AppCompatActivity implements View.OnClickListener, Response.Listener<String>, Response.ErrorListener {
 
     // region 0. Constants
-
-    private static final String REGISTER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/register.php";
-    private static final String UPLOAD_IMAGE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_image.php";
-    private static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
 
     private static final String SAMPLE_IMAGE = "sample_profile_image";
 
@@ -79,7 +79,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 3 Lifecycle
+    // region 2. Lifecycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +114,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 4. Sending message to php
+    // region 3. Clicking on button
 
     @Override
     public void onClick(View view) {
@@ -131,7 +131,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 5. Getting response from php
+    // region 4. Getting response from php
 
     @Override
     public void onResponse(String response) {
@@ -167,7 +167,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 6. Validate inputs
+    // region 5. Validate inputs
 
     private boolean validateName(String strName) {
         if (strName.isEmpty()) {
@@ -214,7 +214,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 7. Request storage permission
+    // region 6. Request storage permission
 
     private void requestStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
@@ -242,7 +242,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 8. Choose image from storage
+    // region 7. Choose image from storage
 
     private void chooseImageFromStorage() {
         Intent intent = new Intent();
@@ -253,7 +253,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 9. Upload data
+    // region 8. Upload data
 
     private void uploadUserData() {
         String strName = this.txtInputName.getEditText().getText().toString().trim();
