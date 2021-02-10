@@ -45,9 +45,6 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
-        Fragment nextFragment = new TemplateFragment();
-        this.getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, nextFragment, "findThisFragment").addToBackStack(null).commit();
     }
 
     // endregion

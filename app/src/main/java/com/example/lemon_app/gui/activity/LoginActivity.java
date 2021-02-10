@@ -153,6 +153,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void openMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("id", this.userId);
+        intent.putExtra("name", this.strName);
         startActivity(intent);
         finish();
 

@@ -8,6 +8,7 @@ public class Post {
     // region 1. Decl and Init
 
     private int id;
+    private int authorId;
     private String image;
     private String author;
     private String date;
@@ -19,8 +20,9 @@ public class Post {
 
     // region 2. Constructor
 
-    public Post(int id, String image, String author, String date, String description, int numberOfLikes, int numberOfComments) {
+    public Post(int id, int authorId, String image, String author, String date, String description, int numberOfLikes, int numberOfComments) {
         this.id = id;
+        this.authorId = authorId;
         this.image = image;
         this.author = author;
         this.date = date;
@@ -35,6 +37,10 @@ public class Post {
 
     public int getId() {
         return id;
+    }
+
+    public int getAuthorId() {
+        return authorId;
     }
 
     public String getImage() {

@@ -13,6 +13,8 @@ public class Constants {
     public static final String REGISTER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/register.php";
     public static final String UPLOAD_IMAGE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_image.php";
     public static final String UPLOAD_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_post.php";
+    public static final String UPLOAD_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/upload_comment.php";
+    public static final String COMMENTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/comments.php";
     public static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/login.php";
     public static final String POSTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/posts.php";
 

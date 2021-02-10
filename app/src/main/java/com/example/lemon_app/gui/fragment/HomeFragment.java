@@ -19,7 +19,6 @@ import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.gui.activity.CreatePostActivity;
 import com.example.lemon_app.gui.activity.MainActivity;
-import com.example.lemon_app.gui.activity.PostActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
 import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.model.Post;
@@ -44,7 +43,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     // region 1. Decl and Init
 
     private View view;
-
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -73,8 +71,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
 
-        this.recyclerView = this.view.findViewById(R.id.recycler_view_post);
-        this.recyclerView.setHasFixedSize(true);
+        this.recyclerView = this.view.findViewById(R.id.recycler_view_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
         this.adapter = new PostAdapter(this.posts, this, getContext());
         this.recyclerView.setLayoutManager(this.layoutManager);
@@ -83,27 +80,36 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
         return this.view;
     }
 
-
     // endregion
 
     // region 3. Post click listener
 
     @Override
     public void onPostListener(int id) {
-        Intent intent = new Intent(getActivity(), PostActivity.class);
-        intent.putExtra("id", id);
-        startActivity(intent);
+        Fragment nextFragment = new CommentsFragment();
+        Bundle data = new Bundle();
+        data.putInt("id", id);
+        nextFragment.setArguments(data);
+        this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, nextFragment).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onAuthorListener(int authorId) {
+        Toast.makeText(getContext(), String.valueOf(authorId), Toast.LENGTH_SHORT).show();
+        // TODO open author user page
     }
 
     // endregion
 
-    // region 4. Floating button listener
+    // region 4. Fab listener
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(getActivity(), CreatePostActivity.class);
-        intent.putExtra("id", MainActivity.getUserId());
-        this.startActivity(intent);
+        if (view.getId() == R.id.fab_add_post) {
+            Intent intent = new Intent(getActivity(), CreatePostActivity.class);
+            intent.putExtra("id", MainActivity.getUserId());
+            this.startActivity(intent);
+        }
     }
 
     // endregion
@@ -112,7 +118,6 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
 
     @Override
     public void onResponse(String response) {
-        ArrayList<Post> posts = new ArrayList<>();
 
         try {
             JSONArray jsonPosts = new JSONArray(response);
@@ -121,6 +126,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                 JSONObject jsonPost = jsonPosts.getJSONObject(ind);
 
                 int id = jsonPost.getInt("id");
+                int authorId = jsonPost.getInt("author_id");
                 String image = jsonPost.getString("image");
                 String author = jsonPost.getString("author");
                 String date = jsonPost.getString("date");
@@ -128,31 +134,19 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
                 int likes = jsonPost.getInt("likes");
                 int comments = jsonPost.getInt("comments");
 
-                Post post = new Post(id, image, author, date, description, likes, comments);
-                posts.add(post);
+                Post post = new Post(id, authorId, image, author, date, description, likes, comments);
+                this.posts.add(post);
+                this.adapter.notifyItemInserted(this.posts.size() - 1);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        setPosts(posts);
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
         Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-
-    // endregion
-
-    // region 6. Set posts after getting data from php
-
-    public void setPosts(ArrayList<Post> posts) {
-        this.posts = posts;
-
-        this.adapter = new PostAdapter(this.posts, this, getContext());
-        this.recyclerView.setAdapter(this.adapter);
-        this.adapter.notifyDataSetChanged();
     }
 
     // endregion

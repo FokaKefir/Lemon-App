@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_post"
+        android:id="@+id/recycler_view_posts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="4dp"
@@ -20,8 +20,6 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_baseline_add_24"
         app:fabSize="normal"
-        app:backgroundTint="@color/primaryColor"
-
-        />
+        app:backgroundTint="@color/primaryColor"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

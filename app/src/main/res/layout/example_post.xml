@@ -16,44 +16,45 @@
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:id="@+id/txt_author"
+            android:id="@+id/txt_post_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Author"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:layout_below="@+id/img_post"/>
+            android:layout_below="@+id/img_post"
+            android:clickable="true"/>
 
         <TextView
-            android:id="@+id/txt_date"
+            android:id="@+id/txt_post_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Date"
             android:textSize="12sp"
-            android:layout_below="@+id/txt_author" />
+            android:layout_below="@+id/txt_post_author" />
 
         <TextView
-            android:id="@+id/txt_description"
+            android:id="@+id/txt_post_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Description"
             android:textSize="15sp"
-            android:layout_below="@+id/txt_date"/>
+            android:layout_below="@+id/txt_post_date"/>
 
         <TextView
-            android:id="@+id/txt_likes"
+            android:id="@+id/txt_post_likes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Likes"
-            android:layout_below="@id/txt_description"/>
+            android:layout_below="@id/txt_post_description"/>
 
         <TextView
-            android:id="@+id/txt_comments"
+            android:id="@+id/txt_post_comments"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Comments"
-            android:layout_below="@+id/txt_likes"/>
+            android:layout_below="@+id/txt_post_likes"/>
 
     </RelativeLayout>
 

@@ -54,6 +54,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         Post currentPost = this.posts.get(position);
 
         holder.id = currentPost.getId();
+        holder.authorId = currentPost.getAuthorId();
         holder.txtAuthor.setText(currentPost.getAuthor());
         holder.txtDate.setText(currentPost.getDate());
         holder.txtDescription.setText(currentPost.getDescription());
@@ -74,6 +75,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public static class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public int id;
+        public int authorId;
         public ImageView image;
         public TextView txtAuthor;
         public TextView txtDate;
@@ -81,25 +83,34 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         public TextView txtLikes;
         public TextView txtComments;
 
+        private View itemView;
+
         private OnPostListener onPostListener;
 
         public PostViewHolder(@NonNull View itemView, OnPostListener onPostListener) {
             super(itemView);
 
-            this.image = itemView.findViewById(R.id.img_post);
-            this.txtAuthor = itemView.findViewById(R.id.txt_author);
-            this.txtDate = itemView.findViewById(R.id.txt_date);
-            this.txtDescription = itemView.findViewById(R.id.txt_description);
-            this.txtLikes = itemView.findViewById(R.id.txt_likes);
-            this.txtComments = itemView.findViewById(R.id.txt_comments);
-
+            this.itemView = itemView;
             this.onPostListener = onPostListener;
-            itemView.setOnClickListener(this);
+
+            this.image = itemView.findViewById(R.id.img_post);
+            this.txtAuthor = itemView.findViewById(R.id.txt_post_author);
+            this.txtDate = itemView.findViewById(R.id.txt_post_date);
+            this.txtDescription = itemView.findViewById(R.id.txt_post_description);
+            this.txtLikes = itemView.findViewById(R.id.txt_post_likes);
+            this.txtComments = itemView.findViewById(R.id.txt_post_comments);
+
+            this.itemView.setOnClickListener(this);
+            this.txtAuthor.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            this.onPostListener.onPostListener(this.id);
+            if (view == this.itemView) {
+                this.onPostListener.onPostListener(this.id);
+            } else if (view.getId() == R.id.txt_post_author) {
+                this.onPostListener.onAuthorListener(this.authorId);
+            }
         }
     }
 
@@ -108,7 +119,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     // region 5. Listener interface
 
     public interface OnPostListener {
-        void onPostListener(int position);
+        void onPostListener(int id);
+        void onAuthorListener(int authorId);
     }
 
     // endregion

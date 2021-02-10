@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView bottomNav;
 
     private static int userId;
+    private static String strUser;
 
     // endregion
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
             userId = bundle.getInt("id");
+            strUser = bundle.getString("name");
         }
 
         this.bottomNav = findViewById(R.id.bottom_navigation);
@@ -111,7 +113,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public static int getUserId() {
         return userId;
     }
-
-    // endregion
+    public static String getStrUser() {
+        return strUser;
+    }
+// endregion
 
 }
