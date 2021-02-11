@@ -132,6 +132,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
                 this.newComment.setId(jsonResponse.getInt("id"));
                 this.comments.add(this.newComment);
                 this.adapter.notifyItemInserted(this.comments.size() - 1);
+                this.txtInputComment.getEditText().setText("");
                 sendNotification();
             }
         }catch (JSONException e) {
@@ -152,8 +153,6 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
                 Comment comment = new Comment(id, this.postId, authorId, author, text);
                 this.comments.add(comment);
                 this.adapter.notifyItemInserted(this.comments.size() - 1);
-
-                this.txtInputComment.getEditText().setText("");
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -22,6 +22,7 @@ public class Constants {
 
     // Delete URls
     public static final String DELETE_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_comment.php";
+    public static final String DELETE_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_post.php";
 
     // Image URL
     public static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";

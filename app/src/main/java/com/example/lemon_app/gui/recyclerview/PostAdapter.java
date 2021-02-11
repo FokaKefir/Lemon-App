@@ -3,16 +3,20 @@ package com.example.lemon_app.gui.recyclerview;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.lemon_app.R;
+import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.model.Post;
 
 import java.util.ArrayList;
@@ -61,6 +65,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.txtLikes.setText(currentPost.getNumberOfLikes() + " likes");
         holder.txtComments.setText(currentPost.getNumberOfComments() + " comments");
         Glide.with(this.context).load(currentPost.getImage()).into(holder.image);
+        if (holder.authorId != MainActivity.getUserId()) {
+            holder.btnOptions.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -72,7 +79,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     // region 4. Holder class
 
-    public static class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
         public int id;
         public int authorId;
@@ -82,6 +89,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         public TextView txtDescription;
         public TextView txtLikes;
         public TextView txtComments;
+        public ImageButton btnOptions;
 
         private View itemView;
 
@@ -99,9 +107,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             this.txtDescription = itemView.findViewById(R.id.txt_post_description);
             this.txtLikes = itemView.findViewById(R.id.txt_post_likes);
             this.txtComments = itemView.findViewById(R.id.txt_post_comments);
+            this.btnOptions = itemView.findViewById(R.id.ib_post_options);
 
             this.itemView.setOnClickListener(this);
             this.txtAuthor.setOnClickListener(this);
+            this.btnOptions.setOnClickListener(this);
         }
 
         @Override
@@ -110,6 +120,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 this.onPostListener.onPostListener(this.id);
             } else if (view.getId() == R.id.txt_post_author) {
                 this.onPostListener.onAuthorListener(this.authorId);
+            } else if (view.getId() == R.id.ib_post_options) {
+                PopupMenu options = new PopupMenu(view.getContext(), view);
+                options.inflate(R.menu.popup_menu);
+                options.setOnMenuItemClickListener(this);
+                options.show();
+            }
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()){
+                case R.id.action_popup_delete:
+                    this.onPostListener.onDeleteListener(this.id);
+                    return true;
+
+                default:
+                    return false;
             }
         }
     }
@@ -121,6 +148,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public interface OnPostListener {
         void onPostListener(int id);
         void onAuthorListener(int authorId);
+        void onDeleteListener(int postId);
     }
 
     // endregion

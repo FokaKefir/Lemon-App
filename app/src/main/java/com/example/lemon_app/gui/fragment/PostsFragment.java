@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.lemon_app.constants.Constants.DELETE_POST_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
 
 public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
@@ -99,6 +100,11 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         // TODO open author user page
     }
 
+    @Override
+    public void onDeleteListener(int postId) {
+        deletePost(postId);
+    }
+
     // endregion
 
     // region 4. Fab listener
@@ -142,6 +148,30 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             e.printStackTrace();
         }
 
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean deleted = jsonResponse.getBoolean("deleted");
+
+            if (deleted) {
+                int deleteId = jsonResponse.getInt("id");
+                int ind = -1;
+                for (int i = 0; i < this.posts.size(); i++) {
+                    if (this.posts.get(i).getId() == deleteId) {
+                        ind = i;
+                        break;
+                    }
+                }
+                if (ind != -1) {
+                    this.posts.remove(ind);
+                    this.adapter.notifyItemRemoved(ind);
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -149,6 +179,15 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
+    // endregion
+
+    // region 6. Delete post
+    private void deletePost(int postId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(postId));
+        DataRequest dataRequest = new DataRequest(params, DELETE_POST_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
+    }
     // endregion
 
 }

@@ -10,11 +10,6 @@
         android:layout_height="match_parent"
         android:layout_margin="4dp">
 
-        <ImageView
-            android:id="@+id/img_post"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"/>
-
         <TextView
             android:id="@+id/txt_post_author"
             android:layout_width="wrap_content"
@@ -23,8 +18,24 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:layout_below="@+id/img_post"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:padding="8dp"/>
+
+        <ImageButton
+            android:id="@+id/ib_post_options"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_baseline_more_24"
+            android:padding="8dp"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <ImageView
+            android:id="@+id/img_post"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_post_author"
+            android:src="@drawable/ic_lemon"/>
 
         <TextView
             android:id="@+id/txt_post_date"
@@ -32,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Date"
             android:textSize="12sp"
-            android:layout_below="@+id/txt_post_author" />
+            android:layout_below="@+id/img_post" />
 
         <TextView
             android:id="@+id/txt_post_description"
