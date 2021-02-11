@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="4dp">
 
         <TextView
@@ -18,7 +18,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:clickable="true"/>
+            android:clickable="true" />
 
         <TextView
             android:id="@+id/txt_comment_text"
@@ -26,7 +26,17 @@
             android:layout_height="wrap_content"
             android:text="Text"
             android:textSize="15sp"
-            android:layout_below="@id/txt_comment_author"/>
+            android:layout_below="@id/txt_comment_author"
+            android:layout_marginRight="60dp"/>
+
+        <ImageButton
+            android:id="@+id/ib_comment_options"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_baseline_more_24"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground" />
 
     </RelativeLayout>
 

@@ -4,6 +4,7 @@ public class Comment {
 
     // region 1. Decl and Init
 
+    private int id;
     private int postId;
     private int authorId;
     private String author;
@@ -20,7 +21,19 @@ public class Comment {
         this.text = text;
     }
 
+    public Comment(int id, int postId, int authorId, String author, String text) {
+        this.id = id;
+        this.postId = postId;
+        this.authorId = authorId;
+        this.author = author;
+        this.text = text;
+    }
+
     // endregion
+
+    public int getId() {
+        return id;
+    }
 
     public int getPostId() {
         return postId;
@@ -36,6 +49,10 @@ public class Comment {
 
     public String getText() {
         return text;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Getters and Setters

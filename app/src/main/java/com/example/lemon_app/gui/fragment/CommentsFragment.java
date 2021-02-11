@@ -21,7 +21,6 @@ import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.CommentAdapter;
 import com.example.lemon_app.model.Comment;
-import com.example.lemon_app.model.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.COMMENTS_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.DELETE_COMMENT_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_COMMENT_REQUEST_URL;
 
 
@@ -79,7 +79,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.comments = new ArrayList<>();
 
         Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(this.postId));
+        params.put("post_id", String.valueOf(this.postId));
         DataRequest dataRequest = new DataRequest(params, COMMENTS_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
 
@@ -94,12 +94,17 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // endregion
 
-    // region 3. Author click listener
+    // region 3. Comment click listener
 
     @Override
     public void onAuthorListener(int authorId) {
         Toast.makeText(getContext(), String.valueOf(authorId), Toast.LENGTH_SHORT).show();
         // TODO open author user page
+    }
+
+    @Override
+    public void onDeleteListener(int commentId) {
+        deleteComment(commentId);
     }
 
     // endregion
@@ -124,8 +129,10 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             boolean uploaded = jsonResponse.getBoolean("uploaded");
 
             if (uploaded) {
+                this.newComment.setId(jsonResponse.getInt("id"));
                 this.comments.add(this.newComment);
                 this.adapter.notifyItemInserted(this.comments.size() - 1);
+                sendNotification();
             }
         }catch (JSONException e) {
             e.printStackTrace();
@@ -137,17 +144,44 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             for (int ind = 0; ind < jsonComments.length(); ind++) {
                 JSONObject jsonComment= jsonComments.getJSONObject(ind);
 
+                int id = jsonComment.getInt("id");
                 int authorId = jsonComment.getInt("author_id");
                 String author = jsonComment.getString("author");
                 String text = jsonComment.getString("text");
 
-                Comment comment = new Comment(this.postId, authorId, author, text);
+                Comment comment = new Comment(id, this.postId, authorId, author, text);
                 this.comments.add(comment);
                 this.adapter.notifyItemInserted(this.comments.size() - 1);
+
+                this.txtInputComment.getEditText().setText("");
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean deleted = jsonResponse.getBoolean("deleted");
+
+            if (deleted) {
+                int deleteId = jsonResponse.getInt("id");
+                int ind = -1;
+                for (int i = 0; i < this.comments.size(); i++) {
+                    if (this.comments.get(i).getId() == deleteId) {
+                        ind = i;
+                        break;
+                    }
+                }
+                if (ind != -1) {
+                    this.comments.remove(ind);
+                    this.adapter.notifyItemRemoved(ind);
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -190,6 +224,25 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         params.put("user_id", String.valueOf(this.userId));
         params.put("text", strComment);
         DataRequest dataRequest = new DataRequest(params, UPLOAD_COMMENT_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
+    }
+
+    // endregion
+
+    // region 8. Sending notification to php
+
+    private void sendNotification() {
+        // TODO send notification
+    }
+
+    // endregion
+
+    // region 9. Delete comment
+
+    private void deleteComment(int commentId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(commentId));
+        DataRequest dataRequest = new DataRequest(params, DELETE_COMMENT_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
     }
 
