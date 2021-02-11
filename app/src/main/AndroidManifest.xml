@@ -22,7 +22,6 @@
         </activity>
         <activity android:name=".gui.activity.RegisterUserActivity" />
         <activity android:name=".gui.activity.CreatePostActivity" />
-        <activity android:name=".gui.activity.PostActivity" />
         <activity android:name=".gui.activity.MainActivity" />
     </application>
 

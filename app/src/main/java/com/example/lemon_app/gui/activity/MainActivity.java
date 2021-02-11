@@ -12,7 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.lemon_app.constants.Constants;
-import com.example.lemon_app.gui.fragment.HomeFragment;
+import com.example.lemon_app.gui.fragment.PostsFragment;
 import com.example.lemon_app.gui.fragment.NotificationsFragment;
 import com.example.lemon_app.R;
 import com.example.lemon_app.gui.fragment.UserFragment;
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
 
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PostsFragment()).commit();
 
     }
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         switch (item.getItemId()){
             case R.id.nav_home:
-                selectedFragment = new HomeFragment();
+                selectedFragment = new PostsFragment();
                 break;
             case R.id.nav_notifications:
                 selectedFragment = new NotificationsFragment();

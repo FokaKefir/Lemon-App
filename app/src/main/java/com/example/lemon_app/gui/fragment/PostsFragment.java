@@ -34,7 +34,7 @@ import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
 
-public class HomeFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
+public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
 
     // region 0. Constants
 
@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment implements PostAdapter.OnPostListener
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.view = inflater.inflate(R.layout.fragment_home, container, false);
+        this.view = inflater.inflate(R.layout.fragment_posts, container, false);
 
         this.fabAddPost = this.view.findViewById(R.id.fab_add_post);
         this.fabAddPost.setOnClickListener(this);
