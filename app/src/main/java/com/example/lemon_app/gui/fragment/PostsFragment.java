@@ -48,7 +48,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     private View view;
 
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private PostAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
     private FloatingActionButton fabAddPost;
@@ -89,7 +89,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onCommentListener(int id) {
-        Fragment nextFragment = new CommentsFragment();
+        Fragment nextFragment = new CommentsFragment(this);
         Bundle data = new Bundle();
         data.putInt("id", id);
         data.putInt("author_id", getPostById(id).getAuthorId());
@@ -170,6 +170,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 Post post = new Post(id, authorId, image, author, date, description, likes, comments, liked);
                 this.posts.add(post);
                 this.adapter.notifyItemInserted(this.posts.size() - 1);
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -239,6 +240,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         if (ind != -1) {
             this.posts.remove(ind);
             this.adapter.notifyItemRemoved(ind);
+            adapterNotifyItemRemoved(ind);
         }
     }
 
@@ -259,7 +261,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.setLiked(true);
             post.increaseLikes();
             this.posts.set(ind, post);
-            this.adapter.notifyItemChanged(ind);
+            //this.adapter.notifyItemChanged(ind);
+            adapterNotifyItemChanged(ind);
         }
     }
 
@@ -276,7 +279,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.setLiked(false);
             post.decreaseLikes();
             this.posts.set(ind, post);
-            this.adapter.notifyItemChanged(ind);
+            //this.adapter.notifyItemChanged(ind);
+            adapterNotifyItemChanged(ind);
         }
     }
 
@@ -297,6 +301,39 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post = this.posts.get(ind);
         }
         return post;
+    }
+
+    private int getIndById(int id) {
+        int ind = -1;
+        for (int i = 0; i < this.posts.size(); i++) {
+            if (this.posts.get(i).getId() == id) {
+                ind = i;
+                break;
+            }
+        }
+        return ind;
+    }
+
+    // endregion
+
+    // region 9. My notify data changed functions for RecyclerView
+
+    private void adapterNotifyItemRemoved(int position) {
+        this.adapter.removeHolder(position);
+    }
+
+    private void adapterNotifyItemChanged(int position) {
+        this.adapter.onBindViewHolder(this.adapter.getMyHolder(position), position);
+    }
+
+    public void adapterNotifyCommentChanged(Integer postId, boolean increase) {
+        int position = getIndById(postId);
+        Post post = this.posts.get(position);
+        if (increase)
+            post.increaseComments();
+        else
+            post.decreaseComments();
+        this.adapter.onBindViewHolder(this.adapter.getMyHolder(position), position);
     }
 
     // endregion

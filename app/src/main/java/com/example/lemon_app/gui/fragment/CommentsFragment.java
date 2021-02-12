@@ -46,6 +46,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     // region 1. Decl and Init
 
     private View view;
+    private PostsFragment postsFragment;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -63,7 +64,11 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // endregion
 
-    // region 2. Lifecycle
+    // region 2. Lifecycle and Constructor
+
+    public CommentsFragment(PostsFragment postsFragment) {
+        this.postsFragment = postsFragment;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -135,11 +140,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             boolean uploaded = jsonResponse.getBoolean("uploaded");
 
             if (uploaded) {
-                this.newComment.setId(jsonResponse.getInt("id"));
-                this.comments.add(this.newComment);
-                this.adapter.notifyItemInserted(this.comments.size() - 1);
-                this.txtInputComment.getEditText().setText("");
-                sendNotification();
+                int id = jsonResponse.getInt("id");
+                insertComment(id);
             }
         }catch (JSONException e) {
             e.printStackTrace();
@@ -232,7 +234,16 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // endregion
 
-    // region 9. Delete comment
+    // region 9. Insert and delete comment
+
+    private void insertComment(int id) {
+        this.newComment.setId(id);
+        this.comments.add(this.newComment);
+        this.adapter.notifyItemInserted(this.comments.size() - 1);
+        this.postsFragment.adapterNotifyCommentChanged(this.postId, true);
+        this.txtInputComment.getEditText().setText("");
+        sendNotification();
+    }
 
     private void deleteComment(int deleteId) {
         int ind = -1;
@@ -245,6 +256,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         if (ind != -1) {
             this.comments.remove(ind);
             this.adapter.notifyItemRemoved(ind);
+
+            this.postsFragment.adapterNotifyCommentChanged(this.postId, false);
         }
     }
 

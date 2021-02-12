@@ -85,6 +85,14 @@ public class Post {
         this.numberOfLikes--;
     }
 
+    public void increaseComments(){
+        this.numberOfComments++;
+    }
+
+    public void decreaseComments(){
+        this.numberOfComments--;
+    }
+
     // endregion
 
 

@@ -21,6 +21,7 @@ import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.model.Post;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
@@ -30,6 +31,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private OnPostListener onPostListener;
     private Context context;
 
+    private List<PostViewHolder> holders;
     // endregion
 
     // region 2. Constructor
@@ -38,6 +40,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         this.posts = posts;
         this.onPostListener = onPostListener;
         this.context = context;
+
+        this.holders = new ArrayList<>();
     }
 
     // endregion
@@ -49,6 +53,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.example_post, parent, false);
         PostViewHolder viewHolder = new PostViewHolder(v, this.onPostListener);
+        this.holders.add(viewHolder);
 
         return viewHolder;
     }
@@ -66,14 +71,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.txtLikes.setText(currentPost.getNumberOfLikes() + " lemons");
         holder.txtComments.setText(currentPost.getNumberOfComments() + " comments");
         Glide.with(this.context).load(currentPost.getImage()).into(holder.imgPost);
-        if (holder.authorId != MainActivity.getUserId()) {
+
+        if (holder.authorId != MainActivity.getUserId())
             holder.btnOptions.setVisibility(View.GONE);
-        }
-        if (currentPost.isLiked()) {
+
+
+        if (currentPost.isLiked())
             holder.imgLike.setImageResource(R.drawable.ic_lemon_colored);
-        } else {
+        else
             holder.imgLike.setImageResource(R.drawable.ic_lemon_gray);
-        }
+
     }
 
     @Override
@@ -104,6 +111,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         public PostViewHolder(@NonNull View itemView, OnPostListener onPostListener) {
             super(itemView);
+
+            this.id = 0;
 
             this.onPostListener = onPostListener;
 
@@ -167,6 +176,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         void onDeleteListener(int postId);
         void onLikeListener(int postId);
         void onUnlikeListener(int postId);
+    }
+
+    // endregion
+
+    // region 6. Getters and Setters
+
+    public PostViewHolder getMyHolder(int position) {
+        return this.holders.get(position);
+    }
+
+    public void removeHolder(int position) {
+        this.holders.remove(position);
     }
 
     // endregion
