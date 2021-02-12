@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lemon_app.R;
 import com.example.lemon_app.gui.activity.MainActivity;
+import com.example.lemon_app.gui.fragment.CommentsFragment;
 import com.example.lemon_app.model.Comment;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.authorId = currentComment.getAuthorId();
         holder.txtAuthor.setText(currentComment.getAuthor());
         holder.txtText.setText(currentComment.getText());
-        if (holder.authorId != MainActivity.getUserId()) {
+        if (holder.authorId != MainActivity.getUserId() && MainActivity.getUserId() != CommentsFragment.getAuthorId()) {
             holder.btnOptions.setVisibility(View.GONE);
         }
     }

@@ -92,6 +92,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         Fragment nextFragment = new CommentsFragment();
         Bundle data = new Bundle();
         data.putInt("id", id);
+        data.putInt("author_id", getPostById(id).getAuthorId());
         nextFragment.setArguments(data);
         this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, nextFragment).addToBackStack(null).commit();
     }
@@ -277,6 +278,25 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             this.posts.set(ind, post);
             this.adapter.notifyItemChanged(ind);
         }
+    }
+
+    // endregion
+
+    // region 8. Getters and Setters
+
+    private Post getPostById(int id) {
+        Post post = null;
+        int ind = -1;
+        for (int i = 0; i < this.posts.size(); i++) {
+            if (this.posts.get(i).getId() == id) {
+                ind = i;
+                break;
+            }
+        }
+        if (ind != -1) {
+            post = this.posts.get(ind);
+        }
+        return post;
     }
 
     // endregion

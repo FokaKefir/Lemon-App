@@ -63,7 +63,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.txtAuthor.setText(currentPost.getAuthor());
         holder.txtDate.setText(currentPost.getDate());
         holder.txtDescription.setText(currentPost.getDescription());
-        holder.txtLikes.setText(currentPost.getNumberOfLikes() + " likes");
+        holder.txtLikes.setText(currentPost.getNumberOfLikes() + " lemons");
         holder.txtComments.setText(currentPost.getNumberOfComments() + " comments");
         Glide.with(this.context).load(currentPost.getImage()).into(holder.imgPost);
         if (holder.authorId != MainActivity.getUserId()) {

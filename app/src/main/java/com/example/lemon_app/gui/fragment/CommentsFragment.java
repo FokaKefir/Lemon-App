@@ -57,6 +57,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     private Comment newComment;
     private ArrayList<Comment> comments;
     private int postId;
+    private static int authorId;
     private int userId;
     private String strName;
 
@@ -69,6 +70,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.view = inflater.inflate(R.layout.fragment_comments, container, false);
 
         this.postId = getArguments().getInt("id");
+        this.authorId = getArguments().getInt("author_id");
         this.userId = MainActivity.getUserId();
         this.strName = MainActivity.getStrUser();
 
@@ -104,7 +106,11 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     @Override
     public void onDeleteListener(int commentId) {
-        deleteComment(commentId);
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(commentId));
+        params.put("post_id", String.valueOf(this.postId));
+        DataRequest dataRequest = new DataRequest(params, DELETE_COMMENT_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
     }
 
     // endregion
@@ -164,17 +170,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
             if (deleted) {
                 int deleteId = jsonResponse.getInt("id");
-                int ind = -1;
-                for (int i = 0; i < this.comments.size(); i++) {
-                    if (this.comments.get(i).getId() == deleteId) {
-                        ind = i;
-                        break;
-                    }
-                }
-                if (ind != -1) {
-                    this.comments.remove(ind);
-                    this.adapter.notifyItemRemoved(ind);
-                }
+                deleteComment(deleteId);
             }
 
         } catch (JSONException e) {
@@ -238,12 +234,28 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // region 9. Delete comment
 
-    private void deleteComment(int commentId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(commentId));
-        DataRequest dataRequest = new DataRequest(params, DELETE_COMMENT_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+    private void deleteComment(int deleteId) {
+        int ind = -1;
+        for (int i = 0; i < this.comments.size(); i++) {
+            if (this.comments.get(i).getId() == deleteId) {
+                ind = i;
+                break;
+            }
+        }
+        if (ind != -1) {
+            this.comments.remove(ind);
+            this.adapter.notifyItemRemoved(ind);
+        }
     }
+
+    // endregion
+
+    // region 10. Getters and Setters
+
+    public static int getAuthorId() {
+        return authorId;
+    }
+
 
     // endregion
 
