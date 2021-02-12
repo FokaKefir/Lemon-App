@@ -15,12 +15,13 @@ public class Post {
     private String description;
     private int numberOfLikes;
     private int numberOfComments;
+    private boolean liked;
 
     // endregion
 
     // region 2. Constructor
 
-    public Post(int id, int authorId, String image, String author, String date, String description, int numberOfLikes, int numberOfComments) {
+    public Post(int id, int authorId, String image, String author, String date, String description, int numberOfLikes, int numberOfComments, boolean liked) {
         this.id = id;
         this.authorId = authorId;
         this.image = image;
@@ -29,6 +30,7 @@ public class Post {
         this.description = description;
         this.numberOfLikes = numberOfLikes;
         this.numberOfComments = numberOfComments;
+        this.liked = liked;
     }
 
     // endregion
@@ -65,6 +67,22 @@ public class Post {
 
     public int getNumberOfComments() {
         return numberOfComments;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
+    public void increaseLikes() {
+        this.numberOfLikes++;
+    }
+
+    public void decreaseLikes() {
+        this.numberOfLikes--;
     }
 
     // endregion

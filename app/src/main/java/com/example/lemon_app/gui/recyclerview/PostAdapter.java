@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -64,9 +65,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.txtDescription.setText(currentPost.getDescription());
         holder.txtLikes.setText(currentPost.getNumberOfLikes() + " likes");
         holder.txtComments.setText(currentPost.getNumberOfComments() + " comments");
-        Glide.with(this.context).load(currentPost.getImage()).into(holder.image);
+        Glide.with(this.context).load(currentPost.getImage()).into(holder.imgPost);
         if (holder.authorId != MainActivity.getUserId()) {
             holder.btnOptions.setVisibility(View.GONE);
+        }
+        if (currentPost.isLiked()) {
+            holder.imgLike.setImageResource(R.drawable.ic_lemon_colored);
+        } else {
+            holder.imgLike.setImageResource(R.drawable.ic_lemon_gray);
         }
     }
 
@@ -83,41 +89,52 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         public int id;
         public int authorId;
-        public ImageView image;
+        public ImageView imgPost;
+        public ImageView imgLike;
         public TextView txtAuthor;
         public TextView txtDate;
         public TextView txtDescription;
         public TextView txtLikes;
         public TextView txtComments;
         public ImageButton btnOptions;
-
-        private View itemView;
+        public LinearLayout layoutLike;
+        public LinearLayout layoutComment;
 
         private OnPostListener onPostListener;
 
         public PostViewHolder(@NonNull View itemView, OnPostListener onPostListener) {
             super(itemView);
 
-            this.itemView = itemView;
             this.onPostListener = onPostListener;
 
-            this.image = itemView.findViewById(R.id.img_post);
+            this.imgPost = itemView.findViewById(R.id.img_post);
+            this.imgLike = itemView.findViewById(R.id.img_post_like);
             this.txtAuthor = itemView.findViewById(R.id.txt_post_author);
             this.txtDate = itemView.findViewById(R.id.txt_post_date);
             this.txtDescription = itemView.findViewById(R.id.txt_post_description);
             this.txtLikes = itemView.findViewById(R.id.txt_post_likes);
             this.txtComments = itemView.findViewById(R.id.txt_post_comments);
             this.btnOptions = itemView.findViewById(R.id.ib_post_options);
+            this.layoutLike = itemView.findViewById(R.id.layout_post_like);
+            this.layoutComment = itemView.findViewById(R.id.layout_post_comment);
 
-            this.itemView.setOnClickListener(this);
             this.txtAuthor.setOnClickListener(this);
             this.btnOptions.setOnClickListener(this);
+            this.layoutLike.setOnClickListener(this);
+            this.layoutComment.setOnClickListener(this);
         }
 
+        @SuppressLint("UseCompatLoadingForDrawables")
         @Override
         public void onClick(View view) {
-            if (view == this.itemView) {
-                this.onPostListener.onPostListener(this.id);
+            if (view.getId() == R.id.layout_post_comment) {
+                this.onPostListener.onCommentListener(this.id);
+            } else if (view.getId() == R.id.layout_post_like) {
+                if (this.imgLike.getDrawable().getConstantState() == view.getResources().getDrawable(R.drawable.ic_lemon_gray).getConstantState()){
+                    this.onPostListener.onLikeListener(this.id);
+                } else {
+                    this.onPostListener.onUnlikeListener(this.id);
+                }
             } else if (view.getId() == R.id.txt_post_author) {
                 this.onPostListener.onAuthorListener(this.authorId);
             } else if (view.getId() == R.id.ib_post_options) {
@@ -134,7 +151,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 case R.id.action_popup_delete:
                     this.onPostListener.onDeleteListener(this.id);
                     return true;
-
                 default:
                     return false;
             }
@@ -146,9 +162,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     // region 5. Listener interface
 
     public interface OnPostListener {
-        void onPostListener(int id);
+        void onCommentListener(int id);
         void onAuthorListener(int authorId);
         void onDeleteListener(int postId);
+        void onLikeListener(int postId);
+        void onUnlikeListener(int postId);
     }
 
     // endregion

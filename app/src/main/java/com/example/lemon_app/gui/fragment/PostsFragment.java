@@ -33,7 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.DELETE_POST_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.LIKE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
 
 public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
 
@@ -86,7 +88,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     // region 3. Post click listener
 
     @Override
-    public void onPostListener(int id) {
+    public void onCommentListener(int id) {
         Fragment nextFragment = new CommentsFragment();
         Bundle data = new Bundle();
         data.putInt("id", id);
@@ -102,7 +104,30 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onDeleteListener(int postId) {
-        deletePost(postId);
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(postId));
+        DataRequest dataRequest = new DataRequest(params, DELETE_POST_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
+    }
+
+    @Override
+    public void onLikeListener(int postId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("post_id", String.valueOf(postId));
+        params.put("user_id", String.valueOf(MainActivity.getUserId()));
+        DataRequest dataRequest = new DataRequest(params, LIKE_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
+        // TODO send notification
+    }
+
+    @Override
+    public void onUnlikeListener(int postId) {
+        Map<String, String> params = new HashMap<>();
+        params.put("post_id", String.valueOf(postId));
+        params.put("user_id", String.valueOf(MainActivity.getUserId()));
+        DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
+        // TODO delete notification
     }
 
     // endregion
@@ -124,7 +149,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onResponse(String response) {
-
+        // Get posts
         try {
             JSONArray jsonPosts = new JSONArray(response);
 
@@ -139,8 +164,9 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 String description = jsonPost.getString("description");
                 int likes = jsonPost.getInt("likes");
                 int comments = jsonPost.getInt("comments");
+                boolean liked = jsonPost.getBoolean("liked");
 
-                Post post = new Post(id, authorId, image, author, date, description, likes, comments);
+                Post post = new Post(id, authorId, image, author, date, description, likes, comments, liked);
                 this.posts.add(post);
                 this.adapter.notifyItemInserted(this.posts.size() - 1);
             }
@@ -148,24 +174,42 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             e.printStackTrace();
         }
 
+        // Delete post
         try {
             JSONObject jsonResponse = new JSONObject(response);
             boolean deleted = jsonResponse.getBoolean("deleted");
 
             if (deleted) {
                 int deleteId = jsonResponse.getInt("id");
-                int ind = -1;
-                for (int i = 0; i < this.posts.size(); i++) {
-                    if (this.posts.get(i).getId() == deleteId) {
-                        ind = i;
-                        break;
-                    }
-                }
-                if (ind != -1) {
-                    this.posts.remove(ind);
-                    this.adapter.notifyItemRemoved(ind);
-                }
+                deletePost(deleteId);
+            }
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Like post
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean liked = jsonResponse.getBoolean("liked");
+
+            if (liked) {
+                int postId = jsonResponse.getInt("post_id");
+                likePost(postId);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Unlike
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean unliked = jsonResponse.getBoolean("unliked");
+
+            if (unliked) {
+                int postId = jsonResponse.getInt("post_id");
+                unlikePost(postId);
             }
 
         } catch (JSONException e) {
@@ -182,12 +226,59 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     // endregion
 
     // region 6. Delete post
-    private void deletePost(int postId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(postId));
-        DataRequest dataRequest = new DataRequest(params, DELETE_POST_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+
+    private void deletePost(int deleteId) {
+        int ind = -1;
+        for (int i = 0; i < this.posts.size(); i++) {
+            if (this.posts.get(i).getId() == deleteId) {
+                ind = i;
+                break;
+            }
+        }
+        if (ind != -1) {
+            this.posts.remove(ind);
+            this.adapter.notifyItemRemoved(ind);
+        }
     }
+
+    // endregion
+
+    // region 7. Like and unlike post
+
+    private void likePost(int postId) {
+        int ind = -1;
+        for (int i = 0; i < this.posts.size(); i++) {
+            if (this.posts.get(i).getId() == postId) {
+                ind = i;
+                break;
+            }
+        }
+        if (ind != -1) {
+            Post post = this.posts.get(ind);
+            post.setLiked(true);
+            post.increaseLikes();
+            this.posts.set(ind, post);
+            this.adapter.notifyItemChanged(ind);
+        }
+    }
+
+    private void unlikePost(int postId) {
+        int ind = -1;
+        for (int i = 0; i < this.posts.size(); i++) {
+            if (this.posts.get(i).getId() == postId) {
+                ind = i;
+                break;
+            }
+        }
+        if (ind != -1) {
+            Post post = this.posts.get(ind);
+            post.setLiked(false);
+            post.decreaseLikes();
+            this.posts.set(ind, post);
+            this.adapter.notifyItemChanged(ind);
+        }
+    }
+
     // endregion
 
 }
