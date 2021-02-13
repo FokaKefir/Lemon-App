@@ -20,6 +20,7 @@ public class Constants {
     public static final String COMMENTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/comments.php";
     public static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/login.php";
     public static final String POSTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/posts.php";
+    public static final String USER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/user.php";
 
     // Delete URls
     public static final String DELETE_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_comment.php";
