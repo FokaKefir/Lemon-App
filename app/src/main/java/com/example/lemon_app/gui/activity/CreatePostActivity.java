@@ -57,7 +57,7 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
 
     private Uri filePath;
 
-    private String strImage;
+    private String image;
     private int userId;
 
     // endregion
@@ -72,7 +72,7 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
         this.filePath = null;
-        this.strImage = "";
+        this.image = "";
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
@@ -128,7 +128,7 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
             boolean success = jsonResponse.getBoolean("success");
 
             if (success) {
-                if (!this.strImage.equals("")) {
+                if (!this.image.equals("")) {
                     uploadImage();
                 }
                 finish();
@@ -205,8 +205,10 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
 
     private void uploadPostData() {
         String strContent = this.txtInputContent.getEditText().getText().toString().trim();
+        String strImage = "";
         if (this.filePath != null){
-            this.strImage = "post_" + UUID.randomUUID().toString();
+            this.image = "post_" + UUID.randomUUID().toString();
+            strImage = IMAGE_URL + this.image + ".jpg";
         }
 
         if (!validateContent(strContent)) {
@@ -216,7 +218,7 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
         Map<String, String> params = new HashMap<>();
         params.put("user_id", String.valueOf(this.userId));
         params.put("content", strContent);
-        params.put("image", IMAGE_URL + this.strImage + ".jpg");
+        params.put("image", strImage);
         DataRequest dataRequest = new DataRequest(params, UPLOAD_POST_REQUEST_URL, this, this);
         Volley.newRequestQueue(CreatePostActivity.this).add(dataRequest);
     }
@@ -230,7 +232,7 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
             //Creating a multi part request
             new MultipartUploadRequest(this, uploadId, UPLOAD_IMAGE_REQUEST_URL)
                     .addFileToUpload(path, "image")
-                    .addParameter("name", this.strImage)
+                    .addParameter("name", this.image)
                     .setNotificationConfig(new UploadNotificationConfig())
                     .setMaxRetries(2)
                     .startUpload();

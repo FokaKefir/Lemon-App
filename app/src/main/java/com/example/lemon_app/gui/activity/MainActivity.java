@@ -31,10 +31,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private static int userId;
     private static String strUser;
 
-    private PostsFragment postsFragment;
-    private NotificationsFragment notificationsFragment;
-    private UserFragment userFragment;
-
     // endregion
 
     // region 2. Lifecycle
@@ -53,11 +49,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
 
-        this.postsFragment = new PostsFragment();
-        this.notificationsFragment = new NotificationsFragment();
-        this.userFragment = new UserFragment();
 
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, this.postsFragment).commit();
+        this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PostsFragment()).commit();
 
     }
 
@@ -77,13 +70,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         Fragment selectedFragment = null;
         switch (item.getItemId()){
             case R.id.nav_home:
-                selectedFragment = this.postsFragment;
+                selectedFragment = new PostsFragment();
                 break;
             case R.id.nav_notifications:
-                selectedFragment = this.notificationsFragment;
+                selectedFragment = new NotificationsFragment();
                 break;
             case R.id.nav_user:
-                selectedFragment = this.userFragment;
+                selectedFragment = new UserFragment();
                 break;
         }
 

@@ -105,8 +105,11 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     @Override
     public void onAuthorListener(int authorId) {
-        Toast.makeText(getContext(), String.valueOf(authorId), Toast.LENGTH_SHORT).show();
-        // TODO open author user page
+        Fragment userFragment = new UserFragment();
+        Bundle data = new Bundle();
+        data.putInt("user_id", authorId);
+        userFragment.setArguments(data);
+        this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
     }
 
     @Override
