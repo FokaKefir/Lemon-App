@@ -16,6 +16,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.lemon_app.R;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.model.Post;
@@ -70,11 +71,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.txtDescription.setText(currentPost.getDescription());
         holder.txtLikes.setText(currentPost.getNumberOfLikes() + " lemons");
         holder.txtComments.setText(currentPost.getNumberOfComments() + " comments");
-        Glide.with(this.context).load(currentPost.getImage()).into(holder.imgPost);
+        Glide.with(this.context)
+                .load(currentPost.getImage())
+                .into(holder.imgPost);
 
-        if (holder.authorId != MainActivity.getUserId())
+        if (currentPost.getAuthorId() != MainActivity.getUserId())
             holder.btnOptions.setVisibility(View.GONE);
-
+        else
+            holder.btnOptions.setVisibility(View.VISIBLE);
 
         if (currentPost.isLiked())
             holder.imgLike.setImageResource(R.drawable.ic_lemon_colored);
@@ -104,6 +108,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         public TextView txtLikes;
         public TextView txtComments;
         public ImageButton btnOptions;
+        public LinearLayout layoutMid;
         public LinearLayout layoutLike;
         public LinearLayout layoutComment;
 
@@ -124,6 +129,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             this.txtLikes = itemView.findViewById(R.id.txt_post_likes);
             this.txtComments = itemView.findViewById(R.id.txt_post_comments);
             this.btnOptions = itemView.findViewById(R.id.ib_post_options);
+            this.layoutMid = itemView.findViewById(R.id.layout_post_mid);
             this.layoutLike = itemView.findViewById(R.id.layout_post_like);
             this.layoutComment = itemView.findViewById(R.id.layout_post_comment);
 

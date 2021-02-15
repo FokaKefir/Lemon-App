@@ -21,6 +21,7 @@ import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.CommentAdapter;
 import com.example.lemon_app.model.Comment;
+import com.example.lemon_app.model.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -243,9 +244,10 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.newComment.setId(id);
         this.comments.add(this.newComment);
         this.adapter.notifyItemInserted(this.comments.size() - 1);
-        this.postsFragment.adapterNotifyCommentChanged(this.postId, true);
         this.txtInputComment.getEditText().setText("");
         sendNotification();
+
+        this.postsFragment.adapterNotifyCommentChanged(this.postId, true);
     }
 
     private void deleteComment(int deleteId) {

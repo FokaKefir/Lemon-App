@@ -243,7 +243,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         if (ind != -1) {
             this.posts.remove(ind);
             this.adapter.notifyItemRemoved(ind);
-            adapterNotifyItemRemoved(ind);
+            this.adapter.removeHolder(ind);
         }
     }
 
@@ -265,7 +265,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.increaseLikes();
             this.posts.set(ind, post);
             //this.adapter.notifyItemChanged(ind);
-            adapterNotifyItemChanged(ind);
+            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+
         }
     }
 
@@ -282,14 +283,28 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.setLiked(false);
             post.decreaseLikes();
             this.posts.set(ind, post);
-            //this.adapter.notifyItemChanged(ind);
-            adapterNotifyItemChanged(ind);
+            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+
         }
     }
 
     // endregion
 
-    // region 8. Getters and Setters
+    // region 8. Comment post
+
+    public void adapterNotifyCommentChanged(Integer postId, boolean increase) {
+        int position = getIndById(postId);
+        Post post = this.posts.get(position);
+        if (increase)
+            post.increaseComments();
+        else
+            post.decreaseComments();
+        this.adapter.onBindViewHolder(this.adapter.getMyHolder(position), position);
+    }
+
+    // endregion
+
+    // region 9. Getters and Setters
 
     private Post getPostById(int id) {
         Post post = null;
@@ -315,28 +330,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             }
         }
         return ind;
-    }
-
-    // endregion
-
-    // region 9. My notify data changed functions for RecyclerView
-
-    private void adapterNotifyItemRemoved(int position) {
-        this.adapter.removeHolder(position);
-    }
-
-    private void adapterNotifyItemChanged(int position) {
-        this.adapter.onBindViewHolder(this.adapter.getMyHolder(position), position);
-    }
-
-    public void adapterNotifyCommentChanged(Integer postId, boolean increase) {
-        int position = getIndById(postId);
-        Post post = this.posts.get(position);
-        if (increase)
-            post.increaseComments();
-        else
-            post.decreaseComments();
-        this.adapter.onBindViewHolder(this.adapter.getMyHolder(position), position);
     }
 
     // endregion
