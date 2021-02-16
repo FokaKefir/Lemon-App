@@ -3,6 +3,7 @@ package com.example.lemon_app.gui.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -49,9 +50,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
 
-
-        this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PostsFragment()).commit();
-
+        this.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new PostsFragment()).commit();
     }
 
     @Override
@@ -116,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public static String getStrUser() {
         return strUser;
     }
-// endregion
+
+    // endregion
 
 }

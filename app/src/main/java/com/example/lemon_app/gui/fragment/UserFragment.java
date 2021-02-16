@@ -50,7 +50,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     private TextView txtName;
     private TextView txtPosts;
-    private TextView txtFriends;
+    private TextView txtFollowers;
+    private TextView txtFollowing;
 
     private RecyclerView recyclerView;
     private PostAdapter adapter;
@@ -61,7 +62,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // endregion
 
-    // region 2. Lifecycle and Constructor
+    // region 2. Lifecycle
 
     @Nullable
     @Override
@@ -79,10 +80,11 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.imgUser = this.view.findViewById(R.id.img_user);
         this.txtName = this.view.findViewById(R.id.txt_user_name);
         this.txtPosts = this.view.findViewById(R.id.txt_user_posts);
-        this.txtFriends = this.view.findViewById(R.id.txt_user_friends);
+        this.txtFollowers = this.view.findViewById(R.id.txt_user_followers);
+        this.txtFollowing = this.view.findViewById(R.id.txt_user_following);
 
-        this.txtPosts.setOnClickListener(this);
-        this.txtFriends.setOnClickListener(this);
+        this.txtFollowers.setOnClickListener(this);
+        this.txtFollowing.setOnClickListener(this);
 
         Map<String, String> paramsUser = new HashMap<>();
         paramsUser.put("id", String.valueOf(this.userId));
@@ -138,11 +140,13 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 String name = jsonResponse.getString("name");
                 String strImage = jsonResponse.getString("image");
                 int numberOfPosts = jsonResponse.getInt("posts");
-                int numberOfFriends = jsonResponse.getInt("friends");
+                int followers = jsonResponse.getInt("followers");
+                int following = jsonResponse.getInt("following");
 
                 this.txtName.setText(name);
-                this.txtPosts.setText(numberOfPosts + " posts");
-                this.txtFriends.setText(numberOfFriends + " friends");
+                this.txtPosts.setText(numberOfPosts + "\nposts");
+                this.txtFollowers.setText(followers + "\nfollowers");
+                this.txtFollowing.setText(following + "\nfollowing");
                 Glide.with(getContext()).load(strImage).into(this.imgUser);
 
                 JSONArray jsonPosts = jsonResponse.getJSONArray("post_array");
