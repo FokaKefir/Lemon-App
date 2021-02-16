@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
 
 public class UserFragment extends PostsFragment implements Response.ErrorListener, Response.Listener<String>, View.OnClickListener, PostAdapter.OnPostListener {
@@ -62,6 +64,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     private RecyclerView.LayoutManager layoutManager;
 
     private int userId;
+    private int userFollowers;
     private ArrayList<Post> posts;
 
     // endregion
@@ -140,9 +143,17 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         } else if (view.getId() == R.id.txt_user_following) {
 
         } else if (view.getId() == R.id.fab_add_user) {
-            Toast.makeText(getContext(), "add user", Toast.LENGTH_SHORT).show();
+            Map<String, String> params = new HashMap<>();
+            params.put("follower_id", String.valueOf(MainActivity.getUserId()));
+            params.put("following_id", String.valueOf(this.userId));
+            DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
+            Volley.newRequestQueue(getContext()).add(dataRequest);
         } else if (view.getId() == R.id.fab_remove_user) {
-            Toast.makeText(getContext(), "remove user", Toast.LENGTH_SHORT).show();
+            Map<String, String> params = new HashMap<>();
+            params.put("follower_id", String.valueOf(MainActivity.getUserId()));
+            params.put("following_id", String.valueOf(this.userId));
+            DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
+            Volley.newRequestQueue(getContext()).add(dataRequest);
         } else if (view.getId() == R.id.fab_search_user){
             Toast.makeText(getContext(), "search for users", Toast.LENGTH_SHORT).show();
         }
@@ -164,12 +175,12 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 String name = jsonResponse.getString("name");
                 String strImage = jsonResponse.getString("image");
                 int numberOfPosts = jsonResponse.getInt("posts");
-                int followers = jsonResponse.getInt("followers");
+                this.userFollowers = jsonResponse.getInt("followers");
                 int following = jsonResponse.getInt("following");
 
                 this.txtName.setText(name);
                 this.txtPosts.setText(numberOfPosts + "\nposts");
-                this.txtFollowers.setText(followers + "\nfollowers");
+                this.txtFollowers.setText(this.userFollowers + "\nfollowers");
                 this.txtFollowing.setText(following + "\nfollowing");
                 Glide.with(getContext()).load(strImage).into(this.imgUser);
 
@@ -246,6 +257,31 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        // Follow user
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean followed = jsonResponse.getBoolean("followed");
+
+            if (followed) {
+                follow();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //Unfollow user
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean unfollowed = jsonResponse.getBoolean("unfollowed");
+
+            if (unfollowed) {
+                unfollow();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -329,7 +365,27 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // endregion
 
-    // region 9. Getters and Setters
+    // region 9. Follow and unfollow user
+
+    @SuppressLint("SetTextI18n")
+    public void follow() {
+        this.fabAddUser.setVisibility(View.INVISIBLE);
+        this.fabRemoveUser.setVisibility(View.VISIBLE);
+        this.userFollowers++;
+        this.txtFollowers.setText(this.userFollowers + "\nfollowers");
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void unfollow() {
+        this.fabRemoveUser.setVisibility(View.INVISIBLE);
+        this.fabAddUser.setVisibility(View.VISIBLE);
+        this.userFollowers--;
+        this.txtFollowers.setText(this.userFollowers + "\nfollowers");
+    }
+
+    // endregion
+
+    // region 10. Getters and Setters
 
     private Post getPostById(int id) {
         Post post = null;

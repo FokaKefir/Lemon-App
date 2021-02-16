@@ -15,6 +15,7 @@ public class Constants {
     public static final String UPLOAD_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/upload_post.php";
     public static final String UPLOAD_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/upload_comment.php";
     public static final String LIKE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/like.php";
+    public static final String FOLLOW_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/follow.php";
 
     // Select URLs
     public static final String COMMENTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/comments.php";
@@ -26,6 +27,7 @@ public class Constants {
     public static final String DELETE_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_comment.php";
     public static final String DELETE_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_post.php";
     public static final String UNLIKE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/unlike.php";
+    public static final String UNFOLLOW_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/unfollow.php";
 
     // Image URL
     public static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
