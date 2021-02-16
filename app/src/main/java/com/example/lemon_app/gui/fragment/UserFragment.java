@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +24,7 @@ import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
 import com.example.lemon_app.model.Post;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,6 +53,10 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     private TextView txtFollowers;
     private TextView txtFollowing;
 
+    private FloatingActionButton fabAddUser;
+    private FloatingActionButton fabRemoveUser;
+    private FloatingActionButton fabSearchUser;
+
     private RecyclerView recyclerView;
     private PostAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -69,9 +73,9 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_user, container, false);
 
-        try {
+        if (getArguments() != null) {
             this.userId = getArguments().getInt("user_id");
-        } catch (Exception e) {
+        } else {
             this.userId = MainActivity.getUserId();
         }
 
@@ -82,11 +86,21 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.txtPosts = this.view.findViewById(R.id.txt_user_posts);
         this.txtFollowers = this.view.findViewById(R.id.txt_user_followers);
         this.txtFollowing = this.view.findViewById(R.id.txt_user_following);
+        this.fabAddUser = this.view.findViewById(R.id.fab_add_user);
+        this.fabRemoveUser = this.view.findViewById(R.id.fab_remove_user);
+        this.fabSearchUser = this.view.findViewById(R.id.fab_search_user);
 
         this.txtFollowers.setOnClickListener(this);
         this.txtFollowing.setOnClickListener(this);
+        this.fabAddUser.setOnClickListener(this);
+        this.fabRemoveUser.setOnClickListener(this);
+        this.fabSearchUser.setOnClickListener(this);
+
+        if (this.userId != MainActivity.getUserId())
+            this.fabSearchUser.setVisibility(View.GONE);
 
         Map<String, String> paramsUser = new HashMap<>();
+        paramsUser.put("logged_id", String.valueOf(MainActivity.getUserId()));
         paramsUser.put("id", String.valueOf(this.userId));
         DataRequest dataRequestUser = new DataRequest(paramsUser, USER_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequestUser);
@@ -121,7 +135,17 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     @Override
     public void onClick(View view) {
+        if (view.getId() == R.id.txt_user_followers) {
 
+        } else if (view.getId() == R.id.txt_user_following) {
+
+        } else if (view.getId() == R.id.fab_add_user) {
+            Toast.makeText(getContext(), "add user", Toast.LENGTH_SHORT).show();
+        } else if (view.getId() == R.id.fab_remove_user) {
+            Toast.makeText(getContext(), "remove user", Toast.LENGTH_SHORT).show();
+        } else if (view.getId() == R.id.fab_search_user){
+            Toast.makeText(getContext(), "search for users", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // endregion
@@ -148,6 +172,13 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 this.txtFollowers.setText(followers + "\nfollowers");
                 this.txtFollowing.setText(following + "\nfollowing");
                 Glide.with(getContext()).load(strImage).into(this.imgUser);
+
+                if (this.userId != MainActivity.getUserId()) {
+                    if (jsonResponse.getBoolean("is_followed"))
+                        this.fabRemoveUser.setVisibility(View.VISIBLE);
+                    else
+                        this.fabAddUser.setVisibility(View.VISIBLE);
+                }
 
                 JSONArray jsonPosts = jsonResponse.getJSONArray("post_array");
 
