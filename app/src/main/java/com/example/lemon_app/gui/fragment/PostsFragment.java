@@ -2,6 +2,7 @@ package com.example.lemon_app.gui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,13 +38,15 @@ import static com.example.lemon_app.constants.Constants.LIKE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
 
-public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
+public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener, View.OnKeyListener {
 
     // region 0. Constants
 
     // endregion
 
     // region 1. Decl and Init
+
+    private MainActivity activity;
 
     private View view;
 
@@ -57,12 +60,21 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     // endregion
 
-    // region 2. Lifecycle
+    // region 2. Lifecycle and Constructor
+
+
+    public PostsFragment(MainActivity activity) {
+        this.activity = activity;
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_posts, container, false);
+
+        this.view.setFocusableInTouchMode(true);
+        this.view.requestFocus();
+        this.view.setOnKeyListener(this);
 
         this.fabAddPost = this.view.findViewById(R.id.fab_add_post);
         this.fabAddPost.setOnClickListener(this);
@@ -89,21 +101,23 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onCommentListener(int id) {
-        Fragment commentsFragment = new CommentsFragment(this);
+        Fragment commentsFragment = new CommentsFragment(this.activity, this);
         Bundle data = new Bundle();
         data.putInt("id", id);
         data.putInt("author_id", getPostById(id).getAuthorId());
         commentsFragment.setArguments(data);
         this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        this.activity.addToFragments(commentsFragment);
     }
 
     @Override
     public void onAuthorListener(int authorId) {
-        Fragment userFragment = new UserFragment();
+        Fragment userFragment = new UserFragment(this.activity);
         Bundle data = new Bundle();
         data.putInt("user_id", authorId);
         userFragment.setArguments(data);
         this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        this.activity.addToFragments(userFragment);
     }
 
     @Override
@@ -332,6 +346,19 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         return ind;
     }
 
+    // endregion
+
+    // region 11. Press key
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                this.activity.removeFromFragments();
+                return true;
+            }
+        }
+        return false;
+    }
     // endregion
 
 }

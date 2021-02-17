@@ -21,7 +21,6 @@ import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.CommentAdapter;
 import com.example.lemon_app.model.Comment;
-import com.example.lemon_app.model.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -46,6 +45,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // region 1. Decl and Init
 
+    private MainActivity activity;
+
     private View view;
     private final PostsFragment postsFragment;
 
@@ -67,7 +68,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // region 2. Lifecycle and Constructor
 
-    public CommentsFragment(PostsFragment postsFragment) {
+    public CommentsFragment(MainActivity activity, PostsFragment postsFragment) {
+        this.activity = activity;
         this.postsFragment = postsFragment;
     }
 
@@ -106,11 +108,12 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     @Override
     public void onAuthorListener(int authorId) {
-        Fragment userFragment = new UserFragment();
+        Fragment userFragment = new UserFragment(this.activity);
         Bundle data = new Bundle();
         data.putInt("user_id", authorId);
         userFragment.setArguments(data);
         this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        this.activity.addToFragments(userFragment);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.example.lemon_app.gui.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -19,6 +18,9 @@ import com.example.lemon_app.R;
 import com.example.lemon_app.gui.fragment.UserFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
 
     // region 0. Constants
@@ -31,6 +33,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private static int userId;
     private static String strUser;
+
+    private List<Fragment> homeFragments;
+    private List<Fragment> notFragments;
+    private List<Fragment> userFragments;
+
+    private List<Fragment> activeFragments;
 
     // endregion
 
@@ -50,13 +58,37 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         this.bottomNav = findViewById(R.id.bottom_navigation);
         this.bottomNav.setOnNavigationItemSelectedListener(this);
 
-        this.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new PostsFragment()).commit();
+        this.homeFragments = new ArrayList<>();
+        this.notFragments = new ArrayList<>();
+        this.userFragments = new ArrayList<>();
+
+        this.homeFragments.add(new PostsFragment(this));
+        this.notFragments.add(new NotificationsFragment(this));
+        this.userFragments.add(new UserFragment(this));
+
+        this.getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, this.homeFragments.get(0)).commit();
+
+        this.getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, this.notFragments.get(0)).hide(this.notFragments.get(0)).commit();
+
+        this.getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, this.userFragments.get(0)).hide(this.userFragments.get(0)).commit();
+
+        this.activeFragments = this.homeFragments;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.logout_menu, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        System.exit(0);
     }
 
     // endregion
@@ -66,21 +98,40 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        List<Fragment> selectedFragments = null;
         Fragment selectedFragment = null;
         switch (item.getItemId()){
             case R.id.nav_home:
-                selectedFragment = new PostsFragment();
+                selectedFragments = this.homeFragments;
+                selectedFragment = new PostsFragment(this);
                 break;
             case R.id.nav_notifications:
-                selectedFragment = new NotificationsFragment();
+                selectedFragments = this.notFragments;
+                selectedFragment = new NotificationsFragment(this);
                 break;
             case R.id.nav_user:
-                selectedFragment = new UserFragment();
+                selectedFragments = this.userFragments;
+                selectedFragment = new UserFragment(this);
                 break;
         }
 
-        if (selectedFragment != null) {
-            this.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+        if (selectedFragments != null) {
+            if (selectedFragments == this.activeFragments) {
+                for (Fragment fragment : this.activeFragments)
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+
+                this.getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, selectedFragment).commit();
+                this.activeFragments.clear();
+                this.activeFragments.add(selectedFragment);
+            } else {
+                for (Fragment fragment : this.activeFragments)
+                    this.getSupportFragmentManager().beginTransaction().hide(fragment).commit();
+                for (Fragment fragment : selectedFragments)
+                    this.getSupportFragmentManager().beginTransaction().show(fragment).commit();
+                this.activeFragments = selectedFragments;
+            }
+
             return true;
         }
         return false;
@@ -107,7 +158,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     // endregion
 
-    // region 5. Getters and Setters
+    // region 5. Fragment functions
+
+    public void addToFragments(Fragment fragment) {
+        this.activeFragments.add(fragment);
+    }
+
+    public void removeFromFragments() {
+        if (this.activeFragments.size() > 1) {
+            Fragment fragment = this.activeFragments.get(this.activeFragments.size() - 1);
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            this.activeFragments.remove(fragment);
+        } else {
+            onBackPressed();
+        }
+    }
+
+    // endregion
+
+    // region 6. Getters and Setters
 
     public static int getUserId() {
         return userId;
