@@ -293,6 +293,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // region 6. Delete post
 
+    @SuppressLint("SetTextI18n")
     private void deletePost(int deleteId) {
         int ind = -1;
         for (int i = 0; i < this.posts.size(); i++) {
@@ -305,6 +306,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             this.posts.remove(ind);
             this.adapter.notifyItemRemoved(ind);
             this.adapter.removeHolder(ind);
+
+            this.txtPosts.setText(this.posts.size() + "\nposts");
         }
     }
 
@@ -373,6 +376,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.fabRemoveUser.setVisibility(View.VISIBLE);
         this.userFollowers++;
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
+        // TODO send notification
     }
 
     @SuppressLint("SetTextI18n")
@@ -381,6 +385,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.fabAddUser.setVisibility(View.VISIBLE);
         this.userFollowers--;
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
+        // TODO delete notification
     }
 
     // endregion

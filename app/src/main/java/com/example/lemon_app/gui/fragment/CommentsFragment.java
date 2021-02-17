@@ -47,7 +47,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     // region 1. Decl and Init
 
     private View view;
-    private PostsFragment postsFragment;
+    private final PostsFragment postsFragment;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -76,7 +76,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.view = inflater.inflate(R.layout.fragment_comments, container, false);
 
         this.postId = getArguments().getInt("id");
-        this.authorId = getArguments().getInt("author_id");
+        authorId = getArguments().getInt("author_id");
         this.userId = MainActivity.getUserId();
         this.strName = MainActivity.getStrUser();
 
