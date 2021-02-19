@@ -112,7 +112,9 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         Bundle data = new Bundle();
         data.putInt("user_id", authorId);
         userFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                .add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
         this.activity.addToFragments(userFragment);
     }
 

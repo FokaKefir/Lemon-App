@@ -136,7 +136,9 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         data.putInt("id", id);
         data.putInt("author_id", getPostById(id).getAuthorId());
         commentsFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                .add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
         this.activity.addToFragments(commentsFragment);
     }
 
@@ -427,7 +429,5 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     }
 
     // endregion
-
-
 
 }

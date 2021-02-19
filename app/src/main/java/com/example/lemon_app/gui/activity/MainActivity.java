@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         if (selectedFragments != null) {
             if (selectedFragments == this.activeFragments) {
                 for (Fragment fragment : this.activeFragments)
-                    getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                    this.getSupportFragmentManager().beginTransaction().remove(fragment).commit();
 
                 this.getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, selectedFragment).commit();
@@ -169,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     public void removeFromFragments() {
         Fragment fragment = this.activeFragments.get(this.activeFragments.size() - 1);
-        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        this.getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.fade_in, R.anim.slide_out, R.anim.slide_in, R.anim.fade_out)
+                .remove(fragment).commit();
         this.activeFragments.remove(fragment);
     }
 

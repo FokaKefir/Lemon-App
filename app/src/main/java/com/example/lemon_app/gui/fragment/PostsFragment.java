@@ -101,7 +101,9 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         data.putInt("id", id);
         data.putInt("author_id", getPostById(id).getAuthorId());
         commentsFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                .add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
         this.activity.addToFragments(commentsFragment);
     }
 
@@ -111,7 +113,9 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         Bundle data = new Bundle();
         data.putInt("user_id", authorId);
         userFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
+                .add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
         this.activity.addToFragments(userFragment);
     }
 
