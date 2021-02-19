@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private BottomNavigationView bottomNav;
 
-    private static int userId;
-    private static String strUser;
+    private int userId;
+    private String strUser;
 
     private List<Fragment> homeFragments;
     private List<Fragment> notFragments;
@@ -86,9 +86,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-        System.exit(0);
+        if (this.activeFragments.size() > 1) {
+            removeFromFragments();
+        } else {
+            finish();
+            System.exit(0);
+        }
     }
 
     // endregion
@@ -158,31 +161,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     // endregion
 
-    // region 5. Fragment functions
+    // region 5. Add and remove fragment
 
     public void addToFragments(Fragment fragment) {
         this.activeFragments.add(fragment);
     }
 
     public void removeFromFragments() {
-        if (this.activeFragments.size() > 1) {
-            Fragment fragment = this.activeFragments.get(this.activeFragments.size() - 1);
-            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            this.activeFragments.remove(fragment);
-        } else {
-            onBackPressed();
-        }
+        Fragment fragment = this.activeFragments.get(this.activeFragments.size() - 1);
+        getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        this.activeFragments.remove(fragment);
     }
 
     // endregion
 
     // region 6. Getters and Setters
 
-    public static int getUserId() {
-        return userId;
+    public int getUserId() {
+        return this.userId;
     }
-    public static String getStrUser() {
-        return strUser;
+
+    public String getStrUser() {
+        return this.strUser;
     }
 
     // endregion

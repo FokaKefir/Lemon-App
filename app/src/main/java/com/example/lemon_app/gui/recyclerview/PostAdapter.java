@@ -33,14 +33,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private Context context;
 
     private List<PostViewHolder> holders;
+
+    private int userId;
     // endregion
 
     // region 2. Constructor
 
-    public PostAdapter(ArrayList<Post> posts, OnPostListener onPostListener, Context context) {
+    public PostAdapter(ArrayList<Post> posts, OnPostListener onPostListener, Context context, int userId) {
         this.posts = posts;
         this.onPostListener = onPostListener;
         this.context = context;
+        this.userId = userId;
 
         this.holders = new ArrayList<>();
     }
@@ -75,7 +78,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .load(currentPost.getImage())
                 .into(holder.imgPost);
 
-        if (currentPost.getAuthorId() != MainActivity.getUserId())
+        if (currentPost.getAuthorId() != this.userId)
             holder.btnOptions.setVisibility(View.GONE);
         else
             holder.btnOptions.setVisibility(View.VISIBLE);

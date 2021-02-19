@@ -39,7 +39,7 @@ import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
 
-public class UserFragment extends PostsFragment implements Response.ErrorListener, Response.Listener<String>, View.OnClickListener, PostAdapter.OnPostListener, View.OnKeyListener {
+public class UserFragment extends PostsFragment implements Response.ErrorListener, Response.Listener<String>, View.OnClickListener, PostAdapter.OnPostListener {
 
     // region 0. Constants
 
@@ -84,14 +84,10 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_user, container, false);
 
-        this.view.setFocusableInTouchMode(true);
-        this.view.requestFocus();
-        this.view.setOnKeyListener(this);
-
         if (getArguments() != null) {
             this.userId = getArguments().getInt("user_id");
         } else {
-            this.userId = MainActivity.getUserId();
+            this.userId = this.activity.getUserId();
         }
 
         this.posts = new ArrayList<>();
@@ -111,18 +107,18 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.fabRemoveUser.setOnClickListener(this);
         this.fabSearchUser.setOnClickListener(this);
 
-        if (this.userId != MainActivity.getUserId())
+        if (this.userId != this.activity.getUserId())
             this.fabSearchUser.setVisibility(View.GONE);
 
         Map<String, String> paramsUser = new HashMap<>();
-        paramsUser.put("logged_id", String.valueOf(MainActivity.getUserId()));
+        paramsUser.put("logged_id", String.valueOf(this.activity.getUserId()));
         paramsUser.put("id", String.valueOf(this.userId));
         DataRequest dataRequestUser = new DataRequest(paramsUser, USER_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequestUser);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_user_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
-        this.adapter = new PostAdapter(this.posts, this, getContext());
+        this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
 
@@ -140,7 +136,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         data.putInt("id", id);
         data.putInt("author_id", getPostById(id).getAuthorId());
         commentsFragment.setArguments(data);
-        this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
         this.activity.addToFragments(commentsFragment);
     }
 
@@ -156,13 +152,13 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
         } else if (view.getId() == R.id.fab_add_user) {
             Map<String, String> params = new HashMap<>();
-            params.put("follower_id", String.valueOf(MainActivity.getUserId()));
+            params.put("follower_id", String.valueOf(this.activity.getUserId()));
             params.put("following_id", String.valueOf(this.userId));
             DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
             Volley.newRequestQueue(getContext()).add(dataRequest);
         } else if (view.getId() == R.id.fab_remove_user) {
             Map<String, String> params = new HashMap<>();
-            params.put("follower_id", String.valueOf(MainActivity.getUserId()));
+            params.put("follower_id", String.valueOf(this.activity.getUserId()));
             params.put("following_id", String.valueOf(this.userId));
             DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
             Volley.newRequestQueue(getContext()).add(dataRequest);
@@ -196,7 +192,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 this.txtFollowing.setText(following + "\nfollowing");
                 Glide.with(getContext()).load(strImage).into(this.imgUser);
 
-                if (this.userId != MainActivity.getUserId()) {
+                if (this.userId != this.activity.getUserId()) {
                     if (jsonResponse.getBoolean("is_followed"))
                         this.fabRemoveUser.setVisibility(View.VISIBLE);
                     else
@@ -432,17 +428,6 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // endregion
 
-    // region 11. Press key
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                this.activity.removeFromFragments();
-                return true;
-            }
-        }
-        return false;
-    }
-    // endregion
+
 
 }

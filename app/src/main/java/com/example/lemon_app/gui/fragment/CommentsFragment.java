@@ -60,7 +60,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     private Comment newComment;
     private ArrayList<Comment> comments;
     private int postId;
-    private static int authorId;
+    private int authorId;
     private int userId;
     private String strName;
 
@@ -78,9 +78,9 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.view = inflater.inflate(R.layout.fragment_comments, container, false);
 
         this.postId = getArguments().getInt("id");
-        authorId = getArguments().getInt("author_id");
-        this.userId = MainActivity.getUserId();
-        this.strName = MainActivity.getStrUser();
+        this.authorId = getArguments().getInt("author_id");
+        this.userId = this.activity.getUserId();
+        this.strName = this.activity.getStrUser();
 
         this.txtInputComment = this.view.findViewById(R.id.txt_new_comment);
         this.fabSend = this.view.findViewById(R.id.fab_send_comment);
@@ -95,7 +95,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_comments);
         this.layoutManager = new LinearLayoutManager(this.getContext());
-        this.adapter = new CommentAdapter(this.comments, this);
+        this.adapter = new CommentAdapter(this.comments, this, this.userId, this.authorId);
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
 
@@ -112,7 +112,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         Bundle data = new Bundle();
         data.putInt("user_id", authorId);
         userFragment.setArguments(data);
-        this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
         this.activity.addToFragments(userFragment);
     }
 
@@ -142,18 +142,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     @Override
     public void onResponse(String response) {
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean uploaded = jsonResponse.getBoolean("uploaded");
-
-            if (uploaded) {
-                int id = jsonResponse.getInt("id");
-                insertComment(id);
-            }
-        }catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        // Get comments
         try {
             JSONArray jsonComments = new JSONArray(response);
 
@@ -173,6 +162,20 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             e.printStackTrace();
         }
 
+        // Insert comment
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean uploaded = jsonResponse.getBoolean("uploaded");
+
+            if (uploaded) {
+                int id = jsonResponse.getInt("id");
+                insertComment(id);
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Delete comment
         try {
             JSONObject jsonResponse = new JSONObject(response);
             boolean deleted = jsonResponse.getBoolean("deleted");
@@ -233,15 +236,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // endregion
 
-    // region 8. Sending notification to php
-
-    private void sendNotification() {
-        // TODO send notification
-    }
-
-    // endregion
-
-    // region 9. Insert and delete comment
+    // region 8. Insert and delete comment
 
     private void insertComment(int id) {
         this.newComment.setId(id);
@@ -271,12 +266,11 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // endregion
 
-    // region 10. Getters and Setters
+    // region 9. Sending notification to php
 
-    public static int getAuthorId() {
-        return authorId;
+    private void sendNotification() {
+        // TODO send notification
     }
-
 
     // endregion
 

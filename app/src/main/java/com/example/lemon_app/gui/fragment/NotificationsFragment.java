@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.example.lemon_app.R;
 import com.example.lemon_app.gui.activity.MainActivity;
 
-public class NotificationsFragment extends Fragment implements View.OnKeyListener {
+public class NotificationsFragment extends Fragment{
 
     // region 0. Constants
 
@@ -39,25 +39,10 @@ public class NotificationsFragment extends Fragment implements View.OnKeyListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_posts, container, false);
 
-        this.view.setFocusableInTouchMode(true);
-        this.view.requestFocus();
-        this.view.setOnKeyListener(this);
-
         return this.view;
     }
 
     // endregion
 
-    // region 11. Press key
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                this.activity.removeFromFragments();
-                return true;
-            }
-        }
-        return false;
-    }
-    // endregion
+
 }

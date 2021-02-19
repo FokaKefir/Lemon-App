@@ -2,7 +2,6 @@ package com.example.lemon_app.gui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ import static com.example.lemon_app.constants.Constants.LIKE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
 
-public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener, View.OnKeyListener {
+public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
 
     // region 0. Constants
 
@@ -72,23 +71,19 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_posts, container, false);
 
-        this.view.setFocusableInTouchMode(true);
-        this.view.requestFocus();
-        this.view.setOnKeyListener(this);
-
         this.fabAddPost = this.view.findViewById(R.id.fab_add_post);
         this.fabAddPost.setOnClickListener(this);
 
         this.posts = new ArrayList<>();
 
         Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(MainActivity.getUserId()));
+        params.put("id", String.valueOf(this.activity.getUserId()));
         DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
-        this.adapter = new PostAdapter(this.posts, this, getContext());
+        this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
 
@@ -106,7 +101,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         data.putInt("id", id);
         data.putInt("author_id", getPostById(id).getAuthorId());
         commentsFragment.setArguments(data);
-        this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
         this.activity.addToFragments(commentsFragment);
     }
 
@@ -116,7 +111,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         Bundle data = new Bundle();
         data.putInt("user_id", authorId);
         userFragment.setArguments(data);
-        this.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        this.activity.getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
         this.activity.addToFragments(userFragment);
     }
 
@@ -132,7 +127,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public void onLikeListener(int postId) {
         Map<String, String> params = new HashMap<>();
         params.put("post_id", String.valueOf(postId));
-        params.put("user_id", String.valueOf(MainActivity.getUserId()));
+        params.put("user_id", String.valueOf(this.activity.getUserId()));
         DataRequest dataRequest = new DataRequest(params, LIKE_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
         // TODO send notification
@@ -142,7 +137,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public void onUnlikeListener(int postId) {
         Map<String, String> params = new HashMap<>();
         params.put("post_id", String.valueOf(postId));
-        params.put("user_id", String.valueOf(MainActivity.getUserId()));
+        params.put("user_id", String.valueOf(this.activity.getUserId()));
         DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
         // TODO delete notification
@@ -155,8 +150,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_add_post) {
-            Intent intent = new Intent(getActivity(), CreatePostActivity.class);
-            intent.putExtra("id", MainActivity.getUserId());
+            Intent intent = new Intent(this.activity, CreatePostActivity.class);
+            intent.putExtra("id", this.activity.getUserId());
             this.startActivity(intent);
         }
     }
@@ -348,17 +343,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     // endregion
 
-    // region 11. Press key
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                this.activity.removeFromFragments();
-                return true;
-            }
-        }
-        return false;
-    }
-    // endregion
+
 
 }

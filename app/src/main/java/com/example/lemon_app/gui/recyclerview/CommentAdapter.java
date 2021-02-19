@@ -25,13 +25,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     private ArrayList<Comment> comments;
     private OnCommentListener onCommentListener;
 
+    private int userId;
+    private int authorId;
+
     // endregion
 
     // region 2. Constructor
 
-    public CommentAdapter(ArrayList<Comment> comments, OnCommentListener onCommentListener) {
+    public CommentAdapter(ArrayList<Comment> comments, OnCommentListener onCommentListener, int userId, int authorId) {
         this.comments = comments;
         this.onCommentListener = onCommentListener;
+        this.userId = userId;
+        this.authorId = authorId;
     }
 
     // endregion
@@ -56,7 +61,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.authorId = currentComment.getAuthorId();
         holder.txtAuthor.setText(currentComment.getAuthor());
         holder.txtText.setText(currentComment.getText());
-        if (holder.authorId != MainActivity.getUserId() && MainActivity.getUserId() != CommentsFragment.getAuthorId()) {
+        if (holder.authorId != this.userId && this.userId != this.authorId) {
             holder.btnOptions.setVisibility(View.GONE);
         }
     }
