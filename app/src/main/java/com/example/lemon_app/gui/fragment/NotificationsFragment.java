@@ -28,7 +28,7 @@ public class NotificationsFragment extends Fragment{
 
     // endregion
 
-    // region 2. Lifecycle
+    // region 2. Lifecycle and Constructor
 
     public NotificationsFragment(MainActivity activity) {
         this.activity = activity;

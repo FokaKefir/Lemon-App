@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.lemon_app.constants.Constants.FOLLOWERS;
+import static com.example.lemon_app.constants.Constants.FOLLOWING;
 import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
@@ -72,7 +74,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // endregion
 
-    // region 2. Lifecycle
+    // region 2. Lifecycle and Constructor
 
     public UserFragment(MainActivity activity) {
         super(activity);
@@ -110,10 +112,10 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         if (this.userId != this.activity.getUserId())
             this.fabSearchUser.setVisibility(View.GONE);
 
-        Map<String, String> paramsUser = new HashMap<>();
-        paramsUser.put("logged_id", String.valueOf(this.activity.getUserId()));
-        paramsUser.put("id", String.valueOf(this.userId));
-        DataRequest dataRequestUser = new DataRequest(paramsUser, USER_REQUEST_URL, this, this);
+        Map<String, String> params = new HashMap<>();
+        params.put("logged_id", String.valueOf(this.activity.getUserId()));
+        params.put("id", String.valueOf(this.userId));
+        DataRequest dataRequestUser = new DataRequest(params, USER_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequestUser);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_user_posts);
@@ -132,13 +134,10 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     @Override
     public void onCommentListener(int id) {
         Fragment commentsFragment = new CommentsFragment(this.activity, this);
-        Bundle data = new Bundle();
-        data.putInt("id", id);
-        data.putInt("author_id", getPostById(id).getAuthorId());
-        commentsFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                .add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        Bundle args = new Bundle();
+        args.putInt("id", id);
+        args.putInt("author_id", getPostById(id).getAuthorId());
+        commentsFragment.setArguments(args);
         this.activity.addToFragments(commentsFragment);
     }
 
@@ -149,9 +148,19 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.txt_user_followers) {
-
+            Fragment followersFragment = new FollowersFragment(this.activity);
+            Bundle args = new Bundle();
+            args.putInt("user_id", this.userId);
+            args.putBoolean("type", FOLLOWERS);
+            followersFragment.setArguments(args);
+            this.activity.addToFragments(followersFragment);
         } else if (view.getId() == R.id.txt_user_following) {
-
+            Fragment followingFragment = new FollowersFragment(this.activity);
+            Bundle args = new Bundle();
+            args.putInt("user_id", this.userId);
+            args.putBoolean("type", FOLLOWING);
+            followingFragment.setArguments(args);
+            this.activity.addToFragments(followingFragment);
         } else if (view.getId() == R.id.fab_add_user) {
             Map<String, String> params = new HashMap<>();
             params.put("follower_id", String.valueOf(this.activity.getUserId()));

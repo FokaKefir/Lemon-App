@@ -97,25 +97,19 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     @Override
     public void onCommentListener(int id) {
         Fragment commentsFragment = new CommentsFragment(this.activity, this);
-        Bundle data = new Bundle();
-        data.putInt("id", id);
-        data.putInt("author_id", getPostById(id).getAuthorId());
-        commentsFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                .add(R.id.fragment_container, commentsFragment).addToBackStack(null).commit();
+        Bundle args = new Bundle();
+        args.putInt("id", id);
+        args.putInt("author_id", getPostById(id).getAuthorId());
+        commentsFragment.setArguments(args);
         this.activity.addToFragments(commentsFragment);
     }
 
     @Override
     public void onAuthorListener(int authorId) {
         Fragment userFragment = new UserFragment(this.activity);
-        Bundle data = new Bundle();
-        data.putInt("user_id", authorId);
-        userFragment.setArguments(data);
-        this.activity.getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_in, R.anim.fade_out, R.anim.fade_in, R.anim.slide_out)
-                .add(R.id.fragment_container, userFragment).addToBackStack(null).commit();
+        Bundle args = new Bundle();
+        args.putInt("user_id", authorId);
+        userFragment.setArguments(args);
         this.activity.addToFragments(userFragment);
     }
 
@@ -186,7 +180,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 Post post = new Post(id, authorId, image, author, date, description, likes, comments, liked);
                 this.posts.add(post);
                 this.adapter.notifyItemInserted(this.posts.size() - 1);
-
             }
         } catch (JSONException e) {
             e.printStackTrace();

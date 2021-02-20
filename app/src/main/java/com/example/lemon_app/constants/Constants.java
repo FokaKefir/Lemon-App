@@ -22,6 +22,7 @@ public class Constants {
     public static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/login.php";
     public static final String POSTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/posts.php";
     public static final String USER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/user.php";
+    public static final String FOLLOWERS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/followers.php";
 
     // Delete URls
     public static final String DELETE_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_comment.php";
@@ -31,5 +32,9 @@ public class Constants {
 
     // Image URL
     public static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
+
+    // Followers
+    public static final boolean FOLLOWERS = true;
+    public static final boolean FOLLOWING = false;
 
 }
