@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -46,6 +47,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     private View view;
 
+    private TextView txtFollowers;
+
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -62,6 +65,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         this.activity = activity;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_followers, container, false);
@@ -79,6 +83,12 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         params.put("followers", String.valueOf(this.type == FOLLOWERS));
         DataRequest dataRequest = new DataRequest(params, FOLLOWERS_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
+
+        this.txtFollowers = this.view.findViewById(R.id.txt_followers);
+        if (this.type == FOLLOWERS)
+            this.txtFollowers.setText("Followers");
+        else
+            this.txtFollowers.setText("Following");
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_followers);
         this.layoutManager = new LinearLayoutManager(this.getContext());

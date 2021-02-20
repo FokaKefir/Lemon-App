@@ -21,8 +21,9 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_exmaple_user"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="4dp"
                 android:src="@drawable/ic_lemon_gray" />
 
             <TextView
@@ -30,10 +31,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Username"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textColor="@android:color/black"
                 android:clickable="true"
-                android:layout_margin="4dp"/>
+                android:layout_margin="8dp"/>
 
         </LinearLayout>
 
@@ -43,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="16dp"
-            android:foregroundGravity="center"
+            android:layout_centerInParent="true"
             android:text="follow"/>
 
         <Button
@@ -52,8 +53,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="16dp"
-            android:foregroundGravity="center"
-            android:text="unfollow"/>
+            android:layout_centerInParent="true"
+            android:text="unfollow" />
 
     </RelativeLayout>
 
