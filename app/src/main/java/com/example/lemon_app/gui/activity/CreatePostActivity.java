@@ -1,10 +1,5 @@
 package com.example.lemon_app.gui.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -16,6 +11,11 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -230,12 +230,14 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
             String uploadId = UUID.randomUUID().toString();
 
             //Creating a multi part request
-            new MultipartUploadRequest(this, uploadId, UPLOAD_IMAGE_REQUEST_URL)
+            MultipartUploadRequest uploadRequest = new MultipartUploadRequest(this, uploadId, UPLOAD_IMAGE_REQUEST_URL)
                     .addFileToUpload(path, "image")
                     .addParameter("name", this.image)
                     .setNotificationConfig(new UploadNotificationConfig())
-                    .setMaxRetries(2)
-                    .startUpload();
+                    .setMaxRetries(2);
+
+            uploadRequest.startUpload();
+
 
         } catch (Exception exc) {
             Toast.makeText(this, exc.getMessage(), Toast.LENGTH_SHORT).show();
