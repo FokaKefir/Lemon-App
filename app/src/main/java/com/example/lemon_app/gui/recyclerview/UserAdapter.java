@@ -112,6 +112,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             this.btnFollow.setOnClickListener(this);
             this.btnUnfollow.setOnClickListener(this);
             this.layoutUser.setOnClickListener(this);
+            this.txtUserName.setOnClickListener(this);
         }
 
         @Override
@@ -120,7 +121,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 this.onUserListener.onFollowListener(this.userId);
             } else if (view.getId() == R.id.btn_unfollow) {
                 this.onUserListener.onUnfollowListener(this.userId);
-            } else if (view.getId() == R.id.layout_example_user) {
+            } else if (view.getId() == R.id.layout_example_user || view.getId() == R.id.txt_example_user_name) {
                 this.onUserListener.onUserListener(this.userId);
             }
         }

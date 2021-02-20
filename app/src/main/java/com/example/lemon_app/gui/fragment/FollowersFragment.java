@@ -1,5 +1,6 @@
 package com.example.lemon_app.gui.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -30,6 +31,8 @@ import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.FOLLOWERS;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
 public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String> {
 
@@ -92,17 +95,29 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     @Override
     public void onUserListener(int id) {
-
+        Fragment userFragment = new UserFragment(this.activity);
+        Bundle args = new Bundle();
+        args.putInt("user_id", id);
+        userFragment.setArguments(args);
+        this.activity.addToFragments(userFragment);
     }
 
     @Override
     public void onFollowListener(int id) {
-
+        Map<String, String> params = new HashMap<>();
+        params.put("follower_id", String.valueOf(this.activity.getUserId()));
+        params.put("following_id", String.valueOf(id));
+        DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
     }
 
     @Override
     public void onUnfollowListener(int id) {
-
+        Map<String, String> params = new HashMap<>();
+        params.put("follower_id", String.valueOf(this.activity.getUserId()));
+        params.put("following_id", String.valueOf(id));
+        DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
     }
 
     // endregion
@@ -130,6 +145,32 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        // Follow user
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean followed = jsonResponse.getBoolean("followed");
+
+            if (followed) {
+                int id = jsonResponse.getInt("id");
+                follow(id);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //Unfollow user
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            boolean unfollowed = jsonResponse.getBoolean("unfollowed");
+
+            if (unfollowed) {
+                int id = jsonResponse.getInt("id");
+                unfollow(id);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -138,4 +179,40 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
     }
 
     // endregion
+
+    // region 5. Follow and unfollow
+
+    public void follow(int id) {
+        int ind = getIndexById(id);
+        if (ind != -1) {
+            this.followers.get(ind).setFollowed(true);
+            this.adapter.notifyItemChanged(ind);
+            // TODO send notification
+        }
+    }
+
+    public void unfollow(int id) {
+        int ind = getIndexById(id);
+        if (ind != -1) {
+            this.followers.get(ind).setFollowed(false);
+            this.adapter.notifyItemChanged(ind);
+            // TODO send notification
+        }
+    }
+
+    // endregion
+
+    // region 6. Getters and Setters
+
+    private int getIndexById(int id) {
+        for (int i = 0; i < this.followers.size(); i++) {
+            if (this.followers.get(i).getId() == id)
+                return i;
+        }
+        return -1;
+    }
+
+    // endregion
+
+
 }

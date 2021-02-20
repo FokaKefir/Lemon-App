@@ -143,7 +143,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // endregion
 
-    // region 4. Button listener
+    // region 4. Button and text listener
 
     @Override
     public void onClick(View view) {
