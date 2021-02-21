@@ -1,6 +1,5 @@
 package com.example.lemon_app.gui.fragment;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -30,16 +30,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.lemon_app.constants.Constants.FOLLOWERS;
-import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.SEARCH_USERS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
-public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String> {
-
-    // region 0. Constants
-
-    // endregion
+public class SearchFragment extends Fragment implements UserAdapter.OnUserListener, View.OnClickListener, Response.ErrorListener, Response.Listener<String> {
 
     // region 1. Decl and Init
 
@@ -47,52 +42,38 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     private View view;
 
-    private TextView txtFollowers;
+    private EditText txtName;
+
+    private Button btnSearch;
 
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    private int userId;
-    private boolean type;
-    private ArrayList<User> followers;
+    private ArrayList<User> users;
 
     // endregion
 
     // region 2. Lifecycle and Constructor
 
-    public FollowersFragment(MainActivity activity) {
+    public SearchFragment(MainActivity activity) {
         this.activity = activity;
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.view = inflater.inflate(R.layout.fragment_followers, container, false);
+        this.view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        if (getArguments() != null) {
-            this.userId = getArguments().getInt("user_id");
-            this.type = getArguments().getBoolean("type");
-        }
+        this.users = new ArrayList<>();
 
-        this.followers = new ArrayList<>();
+        this.txtName = this.view.findViewById(R.id.txt_search_name);
+        this.btnSearch = this.view.findViewById(R.id.btn_search);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("id", String.valueOf(this.userId));
-        params.put("followers", String.valueOf(this.type == FOLLOWERS));
-        DataRequest dataRequest = new DataRequest(params, FOLLOWERS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.btnSearch.setOnClickListener(this);
 
-        this.txtFollowers = this.view.findViewById(R.id.txt_followers);
-        if (this.type == FOLLOWERS)
-            this.txtFollowers.setText("Followers");
-        else
-            this.txtFollowers.setText("Following");
-
-        this.recyclerView = this.view.findViewById(R.id.recycler_view_followers);
+        this.recyclerView = this.view.findViewById(R.id.recycler_view_users);
         this.layoutManager = new LinearLayoutManager(this.getContext());
-        this.adapter = new UserAdapter(this.followers, this, getContext(), this.activity.getLoggedUserId());
+        this.adapter = new UserAdapter(this.users, this, getContext(), this.activity.getLoggedUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
 
@@ -101,7 +82,26 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     // endregion
 
-    // region 3. RecyclerView listener
+    // region 3. Button listener
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btn_search) {
+            this.adapter.notifyItemRangeRemoved(0, this.users.size());
+            this.users.clear();
+
+            String name = this.txtName.getText().toString().trim();
+            Map<String, String> params = new HashMap<>();
+            params.put("name", name);
+            params.put("id", String.valueOf(this.activity.getLoggedUserId()));
+            DataRequest dataRequest = new DataRequest(params, SEARCH_USERS_REQUEST_URL, this, this);
+            Volley.newRequestQueue(getContext()).add(dataRequest);
+        }
+    }
+
+    // endregion
+
+    // region 4. RecyclerView listener
 
     @Override
     public void onUserListener(int id) {
@@ -132,7 +132,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     // endregion
 
-    // region 4. Load data from php
+    // region 5. Load data from php
 
     @Override
     public void onResponse(String response) {
@@ -149,8 +149,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
                 boolean followed = jsonFollower.getBoolean("followed");
 
                 User follower = new User(id, image, name, followed);
-                this.followers.add(follower);
-                this.adapter.notifyItemInserted(this.followers.size() - 1);
+                this.users.add(follower);
+                this.adapter.notifyItemInserted(this.users.size() - 1);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -190,12 +190,12 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     // endregion
 
-    // region 5. Follow and unfollow
+    // region 6. Follow and unfollow
 
     public void follow(int id) {
         int ind = getIndexById(id);
         if (ind != -1) {
-            this.followers.get(ind).setFollowed(true);
+            this.users.get(ind).setFollowed(true);
             this.adapter.notifyItemChanged(ind);
             // TODO send notification
         }
@@ -204,7 +204,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
     public void unfollow(int id) {
         int ind = getIndexById(id);
         if (ind != -1) {
-            this.followers.get(ind).setFollowed(false);
+            this.users.get(ind).setFollowed(false);
             this.adapter.notifyItemChanged(ind);
             // TODO send notification
         }
@@ -212,17 +212,16 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     // endregion
 
-    // region 6. Getters and Setters
+    // region 7. Getters and Setters
 
     private int getIndexById(int id) {
-        for (int i = 0; i < this.followers.size(); i++) {
-            if (this.followers.get(i).getId() == id)
+        for (int i = 0; i < this.users.size(); i++) {
+            if (this.users.get(i).getId() == id)
                 return i;
         }
         return -1;
     }
 
     // endregion
-
 
 }

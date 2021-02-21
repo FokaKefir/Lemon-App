@@ -2,7 +2,6 @@ package com.example.lemon_app.gui.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +88,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         if (getArguments() != null) {
             this.userId = getArguments().getInt("user_id");
         } else {
-            this.userId = this.activity.getUserId();
+            this.userId = this.activity.getLoggedUserId();
         }
 
         this.posts = new ArrayList<>();
@@ -109,18 +108,18 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.fabRemoveUser.setOnClickListener(this);
         this.fabSearchUser.setOnClickListener(this);
 
-        if (this.userId != this.activity.getUserId())
+        if (this.userId != this.activity.getLoggedUserId())
             this.fabSearchUser.setVisibility(View.GONE);
 
         Map<String, String> params = new HashMap<>();
-        params.put("logged_id", String.valueOf(this.activity.getUserId()));
+        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
         params.put("id", String.valueOf(this.userId));
         DataRequest dataRequestUser = new DataRequest(params, USER_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequestUser);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_user_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
-        this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getUserId());
+        this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getLoggedUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
 
@@ -163,18 +162,19 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             this.activity.addToFragments(followingFragment);
         } else if (view.getId() == R.id.fab_add_user) {
             Map<String, String> params = new HashMap<>();
-            params.put("follower_id", String.valueOf(this.activity.getUserId()));
+            params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
             params.put("following_id", String.valueOf(this.userId));
             DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
             Volley.newRequestQueue(getContext()).add(dataRequest);
         } else if (view.getId() == R.id.fab_remove_user) {
             Map<String, String> params = new HashMap<>();
-            params.put("follower_id", String.valueOf(this.activity.getUserId()));
+            params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
             params.put("following_id", String.valueOf(this.userId));
             DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
             Volley.newRequestQueue(getContext()).add(dataRequest);
         } else if (view.getId() == R.id.fab_search_user){
-            Toast.makeText(getContext(), "search for users", Toast.LENGTH_SHORT).show();
+            Fragment searchFragment = new SearchFragment(this.activity);
+            this.activity.addToFragments(searchFragment);
         }
     }
 
@@ -203,7 +203,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 this.txtFollowing.setText(following + "\nfollowing");
                 Glide.with(getContext()).load(strImage).into(this.imgUser);
 
-                if (this.userId != this.activity.getUserId()) {
+                if (this.userId != this.activity.getLoggedUserId()) {
                     if (jsonResponse.getBoolean("is_followed"))
                         this.fabRemoveUser.setVisibility(View.VISIBLE);
                     else

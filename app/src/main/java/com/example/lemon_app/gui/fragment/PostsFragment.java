@@ -77,13 +77,13 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         this.posts = new ArrayList<>();
 
         Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(this.activity.getUserId()));
+        params.put("id", String.valueOf(this.activity.getLoggedUserId()));
         DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
-        this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getUserId());
+        this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getLoggedUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
 
@@ -125,7 +125,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public void onLikeListener(int postId) {
         Map<String, String> params = new HashMap<>();
         params.put("post_id", String.valueOf(postId));
-        params.put("user_id", String.valueOf(this.activity.getUserId()));
+        params.put("user_id", String.valueOf(this.activity.getLoggedUserId()));
         DataRequest dataRequest = new DataRequest(params, LIKE_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
         // TODO send notification
@@ -135,7 +135,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public void onUnlikeListener(int postId) {
         Map<String, String> params = new HashMap<>();
         params.put("post_id", String.valueOf(postId));
-        params.put("user_id", String.valueOf(this.activity.getUserId()));
+        params.put("user_id", String.valueOf(this.activity.getLoggedUserId()));
         DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
         // TODO delete notification
@@ -149,7 +149,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public void onClick(View view) {
         if (view.getId() == R.id.fab_add_post) {
             Intent intent = new Intent(this.activity, CreatePostActivity.class);
-            intent.putExtra("id", this.activity.getUserId());
+            intent.putExtra("id", this.activity.getLoggedUserId());
             this.startActivity(intent);
         }
     }

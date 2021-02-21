@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     // region 6. Getters and Setters
 
-    public int getUserId() {
+    public int getLoggedUserId() {
         return this.userId;
     }
 

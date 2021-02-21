@@ -79,7 +79,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
         this.postId = getArguments().getInt("id");
         this.authorId = getArguments().getInt("author_id");
-        this.userId = this.activity.getUserId();
+        this.userId = this.activity.getLoggedUserId();
         this.strName = this.activity.getStrUser();
 
         this.txtInputComment = this.view.findViewById(R.id.txt_new_comment);
