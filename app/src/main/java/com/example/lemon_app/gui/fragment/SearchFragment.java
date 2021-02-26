@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.UserAdapter;
@@ -197,6 +198,8 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
         if (ind != -1) {
             this.users.get(ind).setFollowed(true);
             this.adapter.notifyItemChanged(ind);
+
+            this.activity.refreshFollow(this, id, Constants.TYPE_FOLLOW);
             // TODO send notification
         }
     }
@@ -206,13 +209,32 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
         if (ind != -1) {
             this.users.get(ind).setFollowed(false);
             this.adapter.notifyItemChanged(ind);
+
+            this.activity.refreshFollow(this, id, Constants.TYPE_UNFOLLOW);
             // TODO send notification
         }
     }
 
     // endregion
 
-    // region 7. Getters and Setters
+    // region 7. Refresh fragment
+
+    public void refreshFollow(int userId, int type) {
+        int ind = getIndexById(userId);
+        if (ind != -1) {
+            if (type == Constants.TYPE_FOLLOW) {
+                this.users.get(ind).setFollowed(true);
+                this.adapter.notifyItemChanged(ind);
+            } else if (type == Constants.TYPE_UNFOLLOW) {
+                this.users.get(ind).setFollowed(false);
+                this.adapter.notifyItemChanged(ind);
+            }
+        }
+    }
+
+    // endregion
+
+    // region 8. Getters and Setters
 
     private int getIndexById(int id) {
         for (int i = 0; i < this.users.size(); i++) {

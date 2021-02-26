@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.CommentAdapter;
@@ -48,7 +49,6 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     private MainActivity activity;
 
     private View view;
-    private final PostsFragment postsFragment;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -68,9 +68,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // region 2. Lifecycle and Constructor
 
-    public CommentsFragment(MainActivity activity, PostsFragment postsFragment) {
+    public CommentsFragment(MainActivity activity) {
         this.activity = activity;
-        this.postsFragment = postsFragment;
     }
 
     @Override
@@ -244,7 +243,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.txtInputComment.getEditText().setText("");
         sendNotification();
 
-        this.postsFragment.adapterNotifyCommentChanged(this.postId, true);
+        this.activity.refreshComment(this, this.postId, Constants.TYPE_INSERT_COMMENT);
     }
 
     private void deleteComment(int deleteId) {
@@ -259,7 +258,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             this.comments.remove(ind);
             this.adapter.notifyItemRemoved(ind);
 
-            this.postsFragment.adapterNotifyCommentChanged(this.postId, false);
+            this.activity.refreshComment(this, this.postId, Constants.TYPE_DELETE_COMMENT);
         }
     }
 

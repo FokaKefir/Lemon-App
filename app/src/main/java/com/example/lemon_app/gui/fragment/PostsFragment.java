@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.gui.activity.CreatePostActivity;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
@@ -96,7 +97,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onCommentListener(int id) {
-        Fragment commentsFragment = new CommentsFragment(this.activity, this);
+        Fragment commentsFragment = new CommentsFragment(this.activity);
         Bundle args = new Bundle();
         args.putInt("id", id);
         args.putInt("author_id", getPostById(id).getAuthorId());
@@ -258,32 +259,20 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     // region 7. Like and unlike post
 
     private void likePost(int postId) {
-        int ind = -1;
-        for (int i = 0; i < this.posts.size(); i++) {
-            if (this.posts.get(i).getId() == postId) {
-                ind = i;
-                break;
-            }
-        }
+        int ind = getIndById(postId);
         if (ind != -1) {
             Post post = this.posts.get(ind);
             post.setLiked(true);
             post.increaseLikes();
             this.posts.set(ind, post);
-            //this.adapter.notifyItemChanged(ind);
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
+            this.activity.refreshLike(this, postId, Constants.TYPE_LIKE);
         }
     }
 
     private void unlikePost(int postId) {
-        int ind = -1;
-        for (int i = 0; i < this.posts.size(); i++) {
-            if (this.posts.get(i).getId() == postId) {
-                ind = i;
-                break;
-            }
-        }
+        int ind = getIndById(postId);
         if (ind != -1) {
             Post post = this.posts.get(ind);
             post.setLiked(false);
@@ -291,26 +280,46 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             this.posts.set(ind, post);
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
+            this.activity.refreshLike(this, postId, Constants.TYPE_UNLIKE);
         }
     }
 
     // endregion
 
-    // region 8. Comment post
+    // region 8. Refresh fragment
 
-    public void adapterNotifyCommentChanged(Integer postId, boolean increase) {
-        int position = getIndById(postId);
-        Post post = this.posts.get(position);
-        if (increase)
+    public void refreshLike(int postId, int type) {
+        int ind = getIndById(postId);
+        if (ind != -1) {
+            if (type == Constants.TYPE_LIKE) {
+                Post post = this.posts.get(ind);
+                post.setLiked(true);
+                post.increaseLikes();
+                this.posts.set(ind, post);
+                this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            } else if (type == Constants.TYPE_UNLIKE) {
+                Post post = this.posts.get(ind);
+                post.setLiked(false);
+                post.decreaseLikes();
+                this.posts.set(ind, post);
+                this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            }
+        }
+    }
+
+    public void refreshComment(int postId, int type) {
+        int ind = getIndById(postId);
+        Post post = this.posts.get(ind);
+        if (type == Constants.TYPE_INSERT_COMMENT)
             post.increaseComments();
-        else
+        else if (type == Constants.TYPE_DELETE_COMMENT)
             post.decreaseComments();
-        this.adapter.onBindViewHolder(this.adapter.getMyHolder(position), position);
+        this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
     }
 
     // endregion
 
-    // region 9. Getters and Setters
+    // region 8. Getters and Setters
 
     private Post getPostById(int id) {
         Post post = null;

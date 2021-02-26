@@ -38,4 +38,12 @@ public class Constants {
     public static final boolean FOLLOWERS = true;
     public static final boolean FOLLOWING = false;
 
+    // Refresh type
+    public static final int TYPE_FOLLOW = 1;
+    public static final int TYPE_UNFOLLOW = 2;
+    public static final int TYPE_LIKE = 3;
+    public static final int TYPE_UNLIKE = 4;
+    public static final int TYPE_INSERT_COMMENT = 5;
+    public static final int TYPE_DELETE_COMMENT = 6;
+
 }

@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
+import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.UserAdapter;
@@ -33,6 +34,7 @@ import java.util.Map;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.TYPE_UNFOLLOW;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
 public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String> {
@@ -197,6 +199,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         if (ind != -1) {
             this.followers.get(ind).setFollowed(true);
             this.adapter.notifyItemChanged(ind);
+
+            this.activity.refreshFollow(this, id, Constants.TYPE_FOLLOW);
             // TODO send notification
         }
     }
@@ -206,13 +210,32 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         if (ind != -1) {
             this.followers.get(ind).setFollowed(false);
             this.adapter.notifyItemChanged(ind);
+
+            this.activity.refreshFollow(this, id, Constants.TYPE_UNFOLLOW);
             // TODO send notification
         }
     }
 
     // endregion
 
-    // region 6. Getters and Setters
+    // region 6. Refresh fragment
+
+    public void refreshFollow(int userId, int type) {
+        int ind = getIndexById(userId);
+        if (ind != -1) {
+            if (type == Constants.TYPE_FOLLOW) {
+                this.followers.get(ind).setFollowed(true);
+                this.adapter.notifyItemChanged(ind);
+            } else if (type == Constants.TYPE_UNFOLLOW) {
+                this.followers.get(ind).setFollowed(false);
+                this.adapter.notifyItemChanged(ind);
+            }
+        }
+    }
+
+    // endregion
+
+    // region 7. Getters and Setters
 
     private int getIndexById(int id) {
         for (int i = 0; i < this.followers.size(); i++) {
