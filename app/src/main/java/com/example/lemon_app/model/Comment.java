@@ -31,6 +31,8 @@ public class Comment {
 
     // endregion
 
+    // region 3. Getters and Setters
+
     public int getId() {
         return id;
     }
@@ -55,6 +57,6 @@ public class Comment {
         this.id = id;
     }
 
-    // Getters and Setters
+    // endregion
 
 }

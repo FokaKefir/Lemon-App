@@ -103,7 +103,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
             this.onUserListener = onUserListener;
 
-            this.imgUser = itemView.findViewById(R.id.img_exmaple_user);
+            this.imgUser = itemView.findViewById(R.id.img_example_user);
             this.txtUserName = itemView.findViewById(R.id.txt_example_user_name);
             this.btnFollow = itemView.findViewById(R.id.btn_follow);
             this.btnUnfollow = itemView.findViewById(R.id.btn_unfollow);
