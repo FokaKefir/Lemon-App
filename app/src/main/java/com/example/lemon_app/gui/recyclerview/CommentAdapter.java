@@ -62,7 +62,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.txtAuthor.setText(currentComment.getAuthor());
         holder.txtText.setText(currentComment.getText());
         if (holder.authorId != this.userId && this.userId != this.authorId) {
-            holder.btnOptions.setVisibility(View.GONE);
+            holder.btnOptions.setVisibility(View.INVISIBLE);
+        } else {
+            holder.btnOptions.setVisibility(View.VISIBLE);
         }
     }
 

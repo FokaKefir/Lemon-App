@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -41,7 +42,7 @@ import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
 
-public class UserFragment extends PostsFragment implements Response.ErrorListener, Response.Listener<String>, View.OnClickListener, PostAdapter.OnPostListener {
+public class UserFragment extends PostsFragment implements Response.ErrorListener, Response.Listener<String>, View.OnClickListener, PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener {
 
     // region 0. Constants
 
@@ -52,6 +53,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     private MainActivity activity;
 
     private View view;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private ImageView imgUser;
 
@@ -123,6 +126,9 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getLoggedUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
+
+        this.swipeRefreshLayout = this.view.findViewById(R.id.layout_swipe_user);
+        this.swipeRefreshLayout.setOnRefreshListener(this);
 
         return this.view;
     }
@@ -230,10 +236,11 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                     this.posts.add(post);
                     this.adapter.notifyItemInserted(this.posts.size() - 1);
                 }
-
+                this.swipeRefreshLayout.setRefreshing(false);
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            this.swipeRefreshLayout.setRefreshing(false);
         }
 
         // Delete post
@@ -361,16 +368,6 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         }
     }
 
-    public void refreshComment(int postId, int type) {
-        int ind = getIndById(postId);
-        Post post = this.posts.get(ind);
-        if (type == Constants.TYPE_INSERT_COMMENT)
-            post.increaseComments();
-        else if (type == Constants.TYPE_DELETE_COMMENT)
-            post.decreaseComments();
-        this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
-    }
-
     // endregion
 
     // region 8. Follow and unfollow user
@@ -435,6 +432,35 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             }
         }
+    }
+
+    public void refreshComment(int postId, int type) {
+        int ind = getIndById(postId);
+        if (ind != -1) {
+            Post post = this.posts.get(ind);
+            if (type == Constants.TYPE_INSERT_COMMENT)
+                post.increaseComments();
+            else if (type == Constants.TYPE_DELETE_COMMENT)
+                post.decreaseComments();
+
+            PostAdapter.PostViewHolder holder = this.adapter.getMyHolder(ind);
+            if (holder != null) {
+                this.adapter.onBindViewHolder(holder, ind);
+            }
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        this.swipeRefreshLayout.setRefreshing(true);
+        this.adapter.notifyItemRangeRemoved(0, this.posts.size());
+        this.posts.clear();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
+        params.put("id", String.valueOf(this.userId));
+        DataRequest dataRequestUser = new DataRequest(params, USER_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequestUser);
     }
 
     // endregion

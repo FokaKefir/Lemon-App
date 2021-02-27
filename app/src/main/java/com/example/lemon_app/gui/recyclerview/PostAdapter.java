@@ -192,7 +192,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     // region 6. Getters and Setters
 
     public PostViewHolder getMyHolder(int position) {
-        return this.holders.get(position);
+        try {
+            return this.holders.get(position);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void removeHolder(int position) {

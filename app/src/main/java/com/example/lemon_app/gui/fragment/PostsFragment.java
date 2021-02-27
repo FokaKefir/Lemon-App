@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -38,7 +39,7 @@ import static com.example.lemon_app.constants.Constants.LIKE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
 
-public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener {
+public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     // region 0. Constants
 
@@ -49,6 +50,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     private MainActivity activity;
 
     private View view;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private RecyclerView recyclerView;
     private PostAdapter adapter;
@@ -61,7 +64,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     // endregion
 
     // region 2. Lifecycle and Constructor
-
 
     public PostsFragment(MainActivity activity) {
         this.activity = activity;
@@ -87,6 +89,9 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         this.adapter = new PostAdapter(this.posts, this, getContext(), this.activity.getLoggedUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
+
+        this.swipeRefreshLayout = this.view.findViewById(R.id.layout_swipe_posts);
+        this.swipeRefreshLayout.setOnRefreshListener(this);
 
         return this.view;
     }
@@ -182,6 +187,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 this.posts.add(post);
                 this.adapter.notifyItemInserted(this.posts.size() - 1);
             }
+
+            this.swipeRefreshLayout.setRefreshing(false);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -232,6 +239,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        this.swipeRefreshLayout.setRefreshing(false);
         Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
@@ -309,12 +317,26 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     public void refreshComment(int postId, int type) {
         int ind = getIndById(postId);
-        Post post = this.posts.get(ind);
-        if (type == Constants.TYPE_INSERT_COMMENT)
-            post.increaseComments();
-        else if (type == Constants.TYPE_DELETE_COMMENT)
-            post.decreaseComments();
-        this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+        if (ind != -1) {
+            Post post = this.posts.get(ind);
+            if (type == Constants.TYPE_INSERT_COMMENT)
+                post.increaseComments();
+            else if (type == Constants.TYPE_DELETE_COMMENT)
+                post.decreaseComments();
+            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        this.swipeRefreshLayout.setRefreshing(true);
+        this.adapter.notifyItemRangeRemoved(0, this.posts.size());
+        this.posts.clear();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(this.activity.getLoggedUserId()));
+        DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
     }
 
     // endregion

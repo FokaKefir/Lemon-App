@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +39,7 @@ import static com.example.lemon_app.constants.Constants.DELETE_COMMENT_REQUEST_U
 import static com.example.lemon_app.constants.Constants.UPLOAD_COMMENT_REQUEST_URL;
 
 
-public class CommentsFragment extends Fragment implements CommentAdapter.OnCommentListener, View.OnClickListener, Response.Listener<String>, Response.ErrorListener {
+public class CommentsFragment extends Fragment implements CommentAdapter.OnCommentListener, View.OnClickListener, Response.Listener<String>, Response.ErrorListener, SwipeRefreshLayout.OnRefreshListener {
 
     // region 0. Constants
 
@@ -49,6 +50,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     private MainActivity activity;
 
     private View view;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -97,6 +100,9 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.adapter = new CommentAdapter(this.comments, this, this.userId, this.authorId);
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
+
+        this.swipeRefreshLayout = this.view.findViewById(R.id.layout_swipe_comments);
+        this.swipeRefreshLayout.setOnRefreshListener(this);
 
         return this.view;
     }
@@ -156,6 +162,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
                 this.comments.add(comment);
                 this.adapter.notifyItemInserted(this.comments.size() - 1);
             }
+
+            this.swipeRefreshLayout.setRefreshing(false);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -191,6 +199,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        this.swipeRefreshLayout.setRefreshing(false);
         Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
@@ -264,7 +273,23 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     // endregion
 
-    // region 9. Sending notification to php
+    // region 9. Refresh fragment
+
+    @Override
+    public void onRefresh() {
+        this.swipeRefreshLayout.setRefreshing(true);
+        this.adapter.notifyItemRangeRemoved(0, this.comments.size());
+        this.comments.clear();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("post_id", String.valueOf(this.postId));
+        DataRequest dataRequest = new DataRequest(params, COMMENTS_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
+    }
+
+    // endregion
+
+    // region 10. Sending notification to php
 
     private void sendNotification() {
         // TODO send notification

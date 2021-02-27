@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +38,7 @@ import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.TYPE_UNFOLLOW;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
-public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String> {
+public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String>, SwipeRefreshLayout.OnRefreshListener {
 
     // region 0. Constants
 
@@ -48,6 +49,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
     private MainActivity activity;
 
     private View view;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private TextView txtFollowers;
 
@@ -97,6 +100,9 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         this.adapter = new UserAdapter(this.followers, this, getContext(), this.activity.getLoggedUserId());
         this.recyclerView.setLayoutManager(this.layoutManager);
         this.recyclerView.setAdapter(this.adapter);
+
+        this.swipeRefreshLayout = this.view.findViewById(R.id.layout_swipe_followers);
+        this.swipeRefreshLayout.setOnRefreshListener(this);
 
         return this.view;
     }
@@ -154,6 +160,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
                 this.followers.add(follower);
                 this.adapter.notifyItemInserted(this.followers.size() - 1);
             }
+
+            this.swipeRefreshLayout.setRefreshing(false);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -188,6 +196,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
     @Override
     public void onErrorResponse(VolleyError error) {
         Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+        this.swipeRefreshLayout.setRefreshing(false);
     }
 
     // endregion
@@ -231,6 +240,20 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
                 this.adapter.notifyItemChanged(ind);
             }
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        this.swipeRefreshLayout.setRefreshing(true);
+        this.adapter.notifyItemRangeRemoved(0, this.followers.size());
+        this.followers.clear();
+
+        Map<String, String> params = new HashMap<>();
+        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
+        params.put("id", String.valueOf(this.userId));
+        params.put("followers", String.valueOf(this.type == FOLLOWERS));
+        DataRequest dataRequest = new DataRequest(params, FOLLOWERS_REQUEST_URL, this, this);
+        Volley.newRequestQueue(getContext()).add(dataRequest);
     }
 
     // endregion
