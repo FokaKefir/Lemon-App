@@ -275,7 +275,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             this.posts.set(ind, post);
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
-            this.activity.refreshLike(this, postId, Constants.TYPE_LIKE);
+            this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_LIKE);
         }
     }
 
@@ -288,7 +288,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             this.posts.set(ind, post);
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
-            this.activity.refreshLike(this, postId, Constants.TYPE_UNLIKE);
+            this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_UNLIKE);
         }
     }
 
@@ -299,13 +299,13 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public void refreshLike(int postId, int type) {
         int ind = getIndById(postId);
         if (ind != -1) {
-            if (type == Constants.TYPE_LIKE) {
+            if (type == Constants.REFRESH_TYPE_LIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(true);
                 post.increaseLikes();
                 this.posts.set(ind, post);
                 this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
-            } else if (type == Constants.TYPE_UNLIKE) {
+            } else if (type == Constants.REFRESH_TYPE_UNLIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(false);
                 post.decreaseLikes();
@@ -319,9 +319,9 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         int ind = getIndById(postId);
         if (ind != -1) {
             Post post = this.posts.get(ind);
-            if (type == Constants.TYPE_INSERT_COMMENT)
+            if (type == Constants.REFRESH_TYPE_INSERT_COMMENT)
                 post.increaseComments();
-            else if (type == Constants.TYPE_DELETE_COMMENT)
+            else if (type == Constants.REFRESH_TYPE_DELETE_COMMENT)
                 post.decreaseComments();
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
         }

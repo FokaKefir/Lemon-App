@@ -351,7 +351,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             this.posts.set(ind, post);
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
-            this.activity.refreshLike(this, postId, Constants.TYPE_LIKE);
+            this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_LIKE);
         }
     }
 
@@ -364,7 +364,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             this.posts.set(ind, post);
             this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
-            this.activity.refreshLike(this, postId, Constants.TYPE_UNLIKE);
+            this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_UNLIKE);
         }
     }
 
@@ -379,7 +379,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.userFollowers++;
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
 
-        this.activity.refreshFollow(this, this.userId, Constants.TYPE_FOLLOW);
+        this.activity.refreshFollow(this, this.userId, Constants.REFRESH_TYPE_FOLLOW);
         // TODO send notification
     }
 
@@ -390,7 +390,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.userFollowers--;
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
 
-        this.activity.refreshFollow(this, this.userId, Constants.TYPE_UNFOLLOW);
+        this.activity.refreshFollow(this, this.userId, Constants.REFRESH_TYPE_UNFOLLOW);
         // TODO delete notification
     }
 
@@ -401,12 +401,12 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     @SuppressLint("SetTextI18n")
     public void refreshFollow(int userId, int type) {
         if (this.userId == userId) {
-            if (type == Constants.TYPE_FOLLOW) {
+            if (type == Constants.REFRESH_TYPE_FOLLOW) {
                 this.fabAddUser.setVisibility(View.INVISIBLE);
                 this.fabRemoveUser.setVisibility(View.VISIBLE);
                 this.userFollowers++;
                 this.txtFollowers.setText(this.userFollowers + "\nfollowers");
-            } else if (type == Constants.TYPE_UNFOLLOW) {
+            } else if (type == Constants.REFRESH_TYPE_UNFOLLOW) {
                 this.fabRemoveUser.setVisibility(View.INVISIBLE);
                 this.fabAddUser.setVisibility(View.VISIBLE);
                 this.userFollowers--;
@@ -418,13 +418,13 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     public void refreshLike(int postId, int type) {
         int ind = getIndById(postId);
         if (ind != -1) {
-            if (type == Constants.TYPE_LIKE) {
+            if (type == Constants.REFRESH_TYPE_LIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(true);
                 post.increaseLikes();
                 this.posts.set(ind, post);
                 this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
-            } else if (type == Constants.TYPE_UNLIKE) {
+            } else if (type == Constants.REFRESH_TYPE_UNLIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(false);
                 post.decreaseLikes();
@@ -438,9 +438,9 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         int ind = getIndById(postId);
         if (ind != -1) {
             Post post = this.posts.get(ind);
-            if (type == Constants.TYPE_INSERT_COMMENT)
+            if (type == Constants.REFRESH_TYPE_INSERT_COMMENT)
                 post.increaseComments();
-            else if (type == Constants.TYPE_DELETE_COMMENT)
+            else if (type == Constants.REFRESH_TYPE_DELETE_COMMENT)
                 post.decreaseComments();
 
             PostAdapter.PostViewHolder holder = this.adapter.getMyHolder(ind);

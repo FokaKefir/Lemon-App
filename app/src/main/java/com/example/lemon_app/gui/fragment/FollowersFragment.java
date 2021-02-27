@@ -35,7 +35,6 @@ import java.util.Map;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.TYPE_UNFOLLOW;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
 public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String>, SwipeRefreshLayout.OnRefreshListener {
@@ -209,7 +208,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
             this.followers.get(ind).setFollowed(true);
             this.adapter.notifyItemChanged(ind);
 
-            this.activity.refreshFollow(this, id, Constants.TYPE_FOLLOW);
+            this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_FOLLOW);
             // TODO send notification
         }
     }
@@ -220,7 +219,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
             this.followers.get(ind).setFollowed(false);
             this.adapter.notifyItemChanged(ind);
 
-            this.activity.refreshFollow(this, id, Constants.TYPE_UNFOLLOW);
+            this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_UNFOLLOW);
             // TODO send notification
         }
     }
@@ -232,10 +231,10 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
     public void refreshFollow(int userId, int type) {
         int ind = getIndexById(userId);
         if (ind != -1) {
-            if (type == Constants.TYPE_FOLLOW) {
+            if (type == Constants.REFRESH_TYPE_FOLLOW) {
                 this.followers.get(ind).setFollowed(true);
                 this.adapter.notifyItemChanged(ind);
-            } else if (type == Constants.TYPE_UNFOLLOW) {
+            } else if (type == Constants.REFRESH_TYPE_UNFOLLOW) {
                 this.followers.get(ind).setFollowed(false);
                 this.adapter.notifyItemChanged(ind);
             }

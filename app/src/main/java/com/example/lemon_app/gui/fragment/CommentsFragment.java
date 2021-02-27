@@ -252,7 +252,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.txtInputComment.getEditText().setText("");
         sendNotification();
 
-        this.activity.refreshComment(this, this.postId, Constants.TYPE_INSERT_COMMENT);
+        this.activity.refreshComment(this, this.postId, Constants.REFRESH_TYPE_INSERT_COMMENT);
     }
 
     private void deleteComment(int deleteId) {
@@ -267,7 +267,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             this.comments.remove(ind);
             this.adapter.notifyItemRemoved(ind);
 
-            this.activity.refreshComment(this, this.postId, Constants.TYPE_DELETE_COMMENT);
+            this.activity.refreshComment(this, this.postId, Constants.REFRESH_TYPE_DELETE_COMMENT);
         }
     }
 

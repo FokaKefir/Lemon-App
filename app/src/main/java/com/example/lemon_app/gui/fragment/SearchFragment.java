@@ -199,7 +199,7 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
             this.users.get(ind).setFollowed(true);
             this.adapter.notifyItemChanged(ind);
 
-            this.activity.refreshFollow(this, id, Constants.TYPE_FOLLOW);
+            this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_FOLLOW);
             // TODO send notification
         }
     }
@@ -210,7 +210,7 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
             this.users.get(ind).setFollowed(false);
             this.adapter.notifyItemChanged(ind);
 
-            this.activity.refreshFollow(this, id, Constants.TYPE_UNFOLLOW);
+            this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_UNFOLLOW);
             // TODO send notification
         }
     }
@@ -222,10 +222,10 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
     public void refreshFollow(int userId, int type) {
         int ind = getIndexById(userId);
         if (ind != -1) {
-            if (type == Constants.TYPE_FOLLOW) {
+            if (type == Constants.REFRESH_TYPE_FOLLOW) {
                 this.users.get(ind).setFollowed(true);
                 this.adapter.notifyItemChanged(ind);
-            } else if (type == Constants.TYPE_UNFOLLOW) {
+            } else if (type == Constants.REFRESH_TYPE_UNFOLLOW) {
                 this.users.get(ind).setFollowed(false);
                 this.adapter.notifyItemChanged(ind);
             }
