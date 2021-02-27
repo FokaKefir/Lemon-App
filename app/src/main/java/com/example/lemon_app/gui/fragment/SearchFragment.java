@@ -211,7 +211,6 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
             this.adapter.notifyItemChanged(ind);
 
             this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_UNFOLLOW);
-            // TODO send notification
         }
     }
 

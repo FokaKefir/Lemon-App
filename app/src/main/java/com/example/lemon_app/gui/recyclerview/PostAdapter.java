@@ -32,8 +32,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private OnPostListener onPostListener;
     private Context context;
 
-    private List<PostViewHolder> holders;
-
     private int userId;
     // endregion
 
@@ -44,8 +42,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         this.onPostListener = onPostListener;
         this.context = context;
         this.userId = userId;
-
-        this.holders = new ArrayList<>();
     }
 
     // endregion
@@ -57,7 +53,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.example_post, parent, false);
         PostViewHolder viewHolder = new PostViewHolder(v, this.onPostListener);
-        this.holders.add(viewHolder);
 
         return viewHolder;
     }
@@ -185,22 +180,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         void onDeleteListener(int postId);
         void onLikeListener(int postId);
         void onUnlikeListener(int postId);
-    }
-
-    // endregion
-
-    // region 6. Getters and Setters
-
-    public PostViewHolder getMyHolder(int position) {
-        try {
-            return this.holders.get(position);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public void removeHolder(int position) {
-        this.holders.remove(position);
     }
 
     // endregion

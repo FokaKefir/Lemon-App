@@ -220,7 +220,6 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
             this.adapter.notifyItemChanged(ind);
 
             this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_UNFOLLOW);
-            // TODO send notification
         }
     }
 

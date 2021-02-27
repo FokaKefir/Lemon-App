@@ -134,7 +134,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         params.put("user_id", String.valueOf(this.activity.getLoggedUserId()));
         DataRequest dataRequest = new DataRequest(params, LIKE_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
-        // TODO send notification
     }
 
     @Override
@@ -144,7 +143,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         params.put("user_id", String.valueOf(this.activity.getLoggedUserId()));
         DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
         Volley.newRequestQueue(getContext()).add(dataRequest);
-        // TODO delete notification
     }
 
     // endregion
@@ -258,7 +256,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         if (ind != -1) {
             this.posts.remove(ind);
             this.adapter.notifyItemRemoved(ind);
-            this.adapter.removeHolder(ind);
         }
     }
 
@@ -273,9 +270,11 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.setLiked(true);
             post.increaseLikes();
             this.posts.set(ind, post);
-            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            this.adapter.notifyItemChanged(ind);
+            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_LIKE);
+            // TODO send notification
         }
     }
 
@@ -286,7 +285,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.setLiked(false);
             post.decreaseLikes();
             this.posts.set(ind, post);
-            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            this.adapter.notifyItemChanged(ind);
+            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_UNLIKE);
         }
@@ -304,13 +304,15 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 post.setLiked(true);
                 post.increaseLikes();
                 this.posts.set(ind, post);
-                this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+                this.adapter.notifyItemChanged(ind);
+                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             } else if (type == Constants.REFRESH_TYPE_UNLIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(false);
                 post.decreaseLikes();
                 this.posts.set(ind, post);
-                this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+                this.adapter.notifyItemChanged(ind);
+                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             }
         }
     }
@@ -323,7 +325,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 post.increaseComments();
             else if (type == Constants.REFRESH_TYPE_DELETE_COMMENT)
                 post.decreaseComments();
-            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            this.adapter.notifyItemChanged(ind);
+            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
         }
     }
 
@@ -341,7 +344,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     // endregion
 
-    // region 8. Getters and Setters
+    // region 9. Getters and Setters
 
     private Post getPostById(int id) {
         Post post = null;
@@ -370,7 +373,5 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     }
 
     // endregion
-
-
 
 }

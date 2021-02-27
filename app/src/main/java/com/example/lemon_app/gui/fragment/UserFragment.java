@@ -332,7 +332,6 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         if (ind != -1) {
             this.posts.remove(ind);
             this.adapter.notifyItemRemoved(ind);
-            this.adapter.removeHolder(ind);
 
             this.txtPosts.setText(this.posts.size() + "\nposts");
         }
@@ -349,7 +348,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             post.setLiked(true);
             post.increaseLikes();
             this.posts.set(ind, post);
-            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            this.adapter.notifyItemChanged(ind);
+            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_LIKE);
         }
@@ -362,7 +362,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             post.setLiked(false);
             post.decreaseLikes();
             this.posts.set(ind, post);
-            this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+            this.adapter.notifyItemChanged(ind);
+            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_UNLIKE);
         }
@@ -391,7 +392,6 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
 
         this.activity.refreshFollow(this, this.userId, Constants.REFRESH_TYPE_UNFOLLOW);
-        // TODO delete notification
     }
 
     // endregion
@@ -423,13 +423,16 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
                 post.setLiked(true);
                 post.increaseLikes();
                 this.posts.set(ind, post);
-                this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+                this.adapter.notifyItemChanged(ind);
+                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+
             } else if (type == Constants.REFRESH_TYPE_UNLIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(false);
                 post.decreaseLikes();
                 this.posts.set(ind, post);
-                this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
+                this.adapter.notifyItemChanged(ind);
+                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             }
         }
     }
@@ -443,10 +446,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             else if (type == Constants.REFRESH_TYPE_DELETE_COMMENT)
                 post.decreaseComments();
 
-            PostAdapter.PostViewHolder holder = this.adapter.getMyHolder(ind);
-            if (holder != null) {
-                this.adapter.onBindViewHolder(holder, ind);
-            }
+            this.adapter.notifyItemChanged(ind);
+            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
         }
     }
 
