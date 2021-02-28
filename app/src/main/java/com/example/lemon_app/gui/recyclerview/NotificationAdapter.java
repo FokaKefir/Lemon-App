@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -73,6 +74,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 break;
         }
 
+        if (!currentNotification.isSeen()) {
+            holder.layout.setBackgroundResource(R.color.primaryColorVariant);
+        } else {
+            holder.layout.setBackgroundResource(R.color.white);
+        }
+
         Glide.with(this.context)
                 .load(currentNotification.getImage())
                 .into(holder.imgUser);
@@ -95,6 +102,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public ImageView imgUser;
         public TextView txtUserName;
         public TextView txtMessage;
+        public RelativeLayout layout;
 
         private View itemView;
 
@@ -112,6 +120,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             this.imgUser = itemView.findViewById(R.id.img_example_notification);
             this.txtUserName = itemView.findViewById(R.id.txt_example_notification_username);
             this.txtMessage = itemView.findViewById(R.id.txt_example_notification_message);
+            this.layout = itemView.findViewById(R.id.layout_example_notification);
 
             this.txtUserName.setOnClickListener(this);
             itemView.setOnClickListener(this);
@@ -135,7 +144,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     // region 5. Listener interface
 
-    public interface OnNotificationListener extends View.OnClickListener {
+    public interface OnNotificationListener {
         void onUserClick(int userId);
         void onPostClick(int postId);
     }

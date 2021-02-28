@@ -24,19 +24,21 @@ public class Notification {
 
     // region 2. Constructor
 
-    public Notification(int id, int userId, int postId, String username, int type, boolean seen) {
+    public Notification(int id, int userId, int postId, String username, String image, int type, boolean seen) {
         this.id = id;
         this.userId = userId;
         this.postId = postId;
         this.username = username;
+        this.image = image;
         this.type = type;
         this.seen = seen;
     }
 
-    public Notification(int id, int userId, String username, int type, boolean seen) {
+    public Notification(int id, int userId, String username, String image, int type, boolean seen) {
         this.id = id;
         this.userId = userId;
         this.username = username;
+        this.image = image;
         this.type = type;
         this.seen = seen;
     }

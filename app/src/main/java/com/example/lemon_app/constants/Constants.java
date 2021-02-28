@@ -24,12 +24,15 @@ public class Constants {
     public static final String USER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/user.php";
     public static final String FOLLOWERS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/followers.php";
     public static final String SEARCH_USERS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/search_users.php";
+    public static final String NOTIFICATIONS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/notifications.php";
 
     // Delete URls
     public static final String DELETE_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_comment.php";
     public static final String DELETE_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_post.php";
     public static final String UNLIKE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/unlike.php";
     public static final String UNFOLLOW_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/unfollow.php";
+
+    // Update URLs
 
     // Image URL
     public static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";
