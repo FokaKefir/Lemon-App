@@ -27,6 +27,7 @@ import com.example.lemon_app.BuildConfig;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.google.android.material.textfield.TextInputLayout;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
@@ -45,7 +46,7 @@ import static com.example.lemon_app.constants.Constants.IMAGE_URL;
 import static com.example.lemon_app.constants.Constants.REGISTER_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_IMAGE_REQUEST_URL;
 
-public class RegisterUserActivity extends AppCompatActivity implements View.OnClickListener, Response.Listener<String>, Response.ErrorListener {
+public class RegisterUserActivity extends AppCompatActivity implements View.OnClickListener, DatabaseManager.RegisterManager.OnResponseListener {
 
     // region 0. Constants
 
@@ -66,6 +67,8 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // region 1. Decl and Init
 
+    private DatabaseManager.RegisterManager databaseManager;
+
     private TextInputLayout txtInputName;
     private TextInputLayout txtInputEmail;
     private TextInputLayout txtInputPassword;
@@ -85,6 +88,8 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_user);
+
+        this.databaseManager = new DatabaseManager.RegisterManager(this, RegisterUserActivity.this);
 
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
 
@@ -131,33 +136,22 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
 
     // endregion
 
-    // region 4. Getting response from php
+    // region 4. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean success = jsonResponse.getBoolean("success");
-
-            if (success) {
-                if (!this.strImage.equals(SAMPLE_IMAGE)) {
-                    uploadImage();
-                }
-                finish();
-
-            } else {
-                String errorMessage = jsonResponse.getString("message");
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(errorMessage)
-                        .setNegativeButton("Retry", null)
-                        .create().show();
-
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onSuccessfulRegisterResponse() {
+        if (!this.strImage.equals(SAMPLE_IMAGE)) {
+            uploadImage();
         }
+        finish();
+    }
 
+    @Override
+    public void onFailedRegisterResponse(String errorMessage) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(errorMessage)
+                .setNegativeButton("Retry", null)
+                .create().show();
     }
 
     @Override
@@ -267,13 +261,7 @@ public class RegisterUserActivity extends AppCompatActivity implements View.OnCl
             return;
         }
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", strName);
-        params.put("password", strPassword);
-        params.put("email", strEmail);
-        params.put("image", IMAGE_URL + this.strImage + ".jpg");
-        DataRequest dataRequest = new DataRequest(params, REGISTER_REQUEST_URL, this, this);
-        Volley.newRequestQueue(RegisterUserActivity.this).add(dataRequest);
+        this.databaseManager.register(strName, strPassword, strEmail, IMAGE_URL + this.strImage + ".jpg");
     }
 
     private void uploadImage() {

@@ -18,6 +18,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.LOGIN_REQUEST_URL;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, Response.Listener<String>, Response.ErrorListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, DatabaseManager.LoginManager.OnResponseListener {
 
     // region 0. Constants
 
@@ -41,6 +42,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // endregion
 
     // region 1. Decl and Init
+
+    private DatabaseManager.LoginManager databaseManager;
 
     private TextInputLayout txtInputName;
     private TextInputLayout txtInputPassword;
@@ -63,6 +66,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        this.databaseManager = new DatabaseManager.LoginManager(this, LoginActivity.this);
 
         this.access = false;
         loadData();
@@ -97,48 +102,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // region 4. Login
 
     private void login() {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", this.strName);
-        params.put("password", this.strPassword);
-        DataRequest dataRequest = new DataRequest(params, LOGIN_REQUEST_URL, this, this);
-        Volley.newRequestQueue(LoginActivity.this).add(dataRequest);
+        this.databaseManager.login(this.strName, this.strPassword);
     }
 
     // endregion
 
-    // region 5. Response from php
+    // region 5. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean success = jsonResponse.getBoolean("success");
-
-            if (success){
-                this.userId = jsonResponse.getInt("id");
-                if (this.access) {
-                    openMainActivity();
-                } else {
-                    dialog();
-                }
-
-
-            } else if(!this.access) {
-                String errorMessage = jsonResponse.getString("message");
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(errorMessage)
-                        .setNegativeButton("Retry", null)
-                        .create().show();
-            } else {
-                this.txtInputName.getEditText().setText(this.strName);
-                this.access = false;
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onSuccessfulLoginResponse(int userId) {
+        this.userId = userId;
+        if (this.access) {
+            openMainActivity();
+        } else {
+            dialog();
         }
+    }
 
+    @Override
+    public void onFailedLoginResponse(String errorMessage) {
+        if(!this.access) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(errorMessage)
+                    .setNegativeButton("Retry", null)
+                    .create().show();
+        } else {
+            this.txtInputName.getEditText().setText(this.strName);
+            this.access = false;
+        }
     }
 
     @Override
