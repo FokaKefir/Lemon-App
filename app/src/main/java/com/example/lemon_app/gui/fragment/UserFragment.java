@@ -16,33 +16,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
-import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
 import com.example.lemon_app.model.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 
 import static com.example.lemon_app.constants.Constants.FOLLOWERS;
 import static com.example.lemon_app.constants.Constants.FOLLOWING;
-import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
 
-public class UserFragment extends PostsFragment implements Response.ErrorListener, Response.Listener<String>, View.OnClickListener, PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener {
+public class UserFragment extends PostsFragment implements View.OnClickListener, PostAdapter.OnPostListener, SwipeRefreshLayout.OnRefreshListener, DatabaseManager.UserManager.OnResponseListener{
 
     // region 0. Constants
 
@@ -53,6 +44,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
     private MainActivity activity;
 
     private View view;
+
+    private DatabaseManager.UserManager databaseManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -95,6 +88,8 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             this.userId = this.activity.getLoggedUserId();
         }
 
+        this.databaseManager = new DatabaseManager.UserManager(this, getContext());
+
         this.posts = new ArrayList<>();
 
         this.imgUser = this.view.findViewById(R.id.img_user);
@@ -115,11 +110,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         if (this.userId != this.activity.getLoggedUserId())
             this.fabSearchUser.setVisibility(View.GONE);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("id", String.valueOf(this.userId));
-        DataRequest dataRequestUser = new DataRequest(params, USER_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequestUser);
+        this.databaseManager.userRequest(this.activity.getLoggedUserId(), this.userId);
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_user_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
@@ -147,6 +138,26 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.activity.addToFragments(commentsFragment);
     }
 
+    @Override
+    public void onAuthorListener(int authorId) {
+        super.onAuthorListener(authorId);
+    }
+
+    @Override
+    public void onDeleteListener(int postId) {
+        this.databaseManager.deletePost(postId);
+    }
+
+    @Override
+    public void onLikeListener(int postId) {
+        this.databaseManager.likePost(postId, this.activity.getLoggedUserId());
+    }
+
+    @Override
+    public void onUnlikeListener(int postId) {
+        this.databaseManager.unlikePost(postId, this.activity.getLoggedUserId());
+    }
+
     // endregion
 
     // region 4. Button and text listener
@@ -168,17 +179,9 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
             followingFragment.setArguments(args);
             this.activity.addToFragments(followingFragment);
         } else if (view.getId() == R.id.fab_add_user) {
-            Map<String, String> params = new HashMap<>();
-            params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
-            params.put("following_id", String.valueOf(this.userId));
-            DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
-            Volley.newRequestQueue(getContext()).add(dataRequest);
+            this.databaseManager.followUser(this.activity.getLoggedUserId(), this.userId);
         } else if (view.getId() == R.id.fab_remove_user) {
-            Map<String, String> params = new HashMap<>();
-            params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
-            params.put("following_id", String.valueOf(this.userId));
-            DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
-            Volley.newRequestQueue(getContext()).add(dataRequest);
+            this.databaseManager.unfollowUser(this.activity.getLoggedUserId(), this.userId);
         } else if (view.getId() == R.id.fab_search_user){
             Fragment searchFragment = new SearchFragment(this.activity);
             this.activity.addToFragments(searchFragment);
@@ -187,128 +190,56 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
 
     // endregion
 
-    // region 5. Load data from php
+    // region 5. Database manager listener
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onResponse(String response) {
-        // Get user data
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean success = jsonResponse.getBoolean("success");
+    public void onUserResponse(String name, String strImage, int numberOfPosts, int userFollowers, int following, boolean isFollowed, ArrayList<Post> posts) {
+        this.userFollowers = userFollowers;
+        this.txtName.setText(name);
+        this.txtPosts.setText(numberOfPosts + "\nposts");
+        this.txtFollowers.setText(this.userFollowers + "\nfollowers");
+        this.txtFollowing.setText(following + "\nfollowing");
+        Glide.with(getContext()).load(strImage).into(this.imgUser);
 
-            if (success) {
-                String name = jsonResponse.getString("name");
-                String strImage = jsonResponse.getString("image");
-                int numberOfPosts = jsonResponse.getInt("posts");
-                this.userFollowers = jsonResponse.getInt("followers");
-                int following = jsonResponse.getInt("following");
-
-                this.txtName.setText(name);
-                this.txtPosts.setText(numberOfPosts + "\nposts");
-                this.txtFollowers.setText(this.userFollowers + "\nfollowers");
-                this.txtFollowing.setText(following + "\nfollowing");
-                Glide.with(getContext()).load(strImage).into(this.imgUser);
-
-                if (this.userId != this.activity.getLoggedUserId()) {
-                    if (jsonResponse.getBoolean("is_followed"))
-                        this.fabRemoveUser.setVisibility(View.VISIBLE);
-                    else
-                        this.fabAddUser.setVisibility(View.VISIBLE);
-                }
-
-                JSONArray jsonPosts = jsonResponse.getJSONArray("post_array");
-
-                for (int ind = 0; ind < jsonPosts.length(); ind++) {
-                    JSONObject jsonPost = jsonPosts.getJSONObject(ind);
-
-                    int id = jsonPost.getInt("id");
-                    int authorId = jsonPost.getInt("author_id");
-                    String image = jsonPost.getString("image");
-                    String author = jsonPost.getString("author");
-                    String date = jsonPost.getString("date");
-                    String description = jsonPost.getString("description");
-                    int likes = jsonPost.getInt("likes");
-                    int comments = jsonPost.getInt("comments");
-                    boolean liked = jsonPost.getBoolean("liked");
-
-                    Post post = new Post(id, authorId, image, author, date, description, likes, comments, liked);
-                    this.posts.add(post);
-                    this.adapter.notifyItemInserted(this.posts.size() - 1);
-                }
-                this.swipeRefreshLayout.setRefreshing(false);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            this.swipeRefreshLayout.setRefreshing(false);
+        if (this.userId != this.activity.getLoggedUserId()) {
+            if (isFollowed)
+                this.fabRemoveUser.setVisibility(View.VISIBLE);
+            else
+                this.fabAddUser.setVisibility(View.VISIBLE);
         }
 
-        // Delete post
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean deleted = jsonResponse.getBoolean("deleted");
-
-            if (deleted) {
-                int deleteId = jsonResponse.getInt("id");
-                deletePost(deleteId);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        for (Post post : posts) {
+            this.posts.add(post);
+            this.adapter.notifyItemInserted(this.posts.size() - 1);
         }
 
-        // Like post
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean liked = jsonResponse.getBoolean("liked");
+        this.swipeRefreshLayout.setRefreshing(false);
+    }
 
-            if (liked) {
-                int postId = jsonResponse.getInt("post_id");
-                likePost(postId);
-            }
+    @Override
+    public void onFollowUserResponse() {
+        follow();
+    }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onUnfollowUserResponse() {
+        unfollow();
+    }
 
-        // Unlike
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean unliked = jsonResponse.getBoolean("unliked");
+    @Override
+    public void onDeletePostResponse(int deleteId) {
+        deletePost(deleteId);
+    }
 
-            if (unliked) {
-                int postId = jsonResponse.getInt("post_id");
-                unlikePost(postId);
-            }
+    @Override
+    public void onLikePostResponse(int postId) {
+        likePost(postId);
+    }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // Follow user
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean followed = jsonResponse.getBoolean("followed");
-
-            if (followed) {
-                follow();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        //Unfollow user
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean unfollowed = jsonResponse.getBoolean("unfollowed");
-
-            if (unfollowed) {
-                unfollow();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+    @Override
+    public void onUnlikePostResponse(int postId) {
+        unlikePost(postId);
     }
 
     @Override
@@ -457,11 +388,7 @@ public class UserFragment extends PostsFragment implements Response.ErrorListene
         this.adapter.notifyItemRangeRemoved(0, this.posts.size());
         this.posts.clear();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("id", String.valueOf(this.userId));
-        DataRequest dataRequestUser = new DataRequest(params, USER_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequestUser);
+        this.databaseManager.userRequest(this.activity.getLoggedUserId(), this.userId);
     }
 
     // endregion

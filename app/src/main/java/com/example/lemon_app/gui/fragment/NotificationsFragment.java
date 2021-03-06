@@ -18,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.NotificationAdapter;
 import com.example.lemon_app.model.Notification;
@@ -32,13 +33,15 @@ import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.NOTIFICATIONS_REQUEST_URL;
 
-public class NotificationsFragment extends Fragment implements NotificationAdapter.OnNotificationListener, SwipeRefreshLayout.OnRefreshListener, Response.ErrorListener, Response.Listener<String> {
+public class NotificationsFragment extends Fragment implements NotificationAdapter.OnNotificationListener, SwipeRefreshLayout.OnRefreshListener, DatabaseManager.NotificationsManager.OnResponseListener {
 
     // region 1. Decl and Init
 
     private MainActivity activity;
 
     private View view;
+
+    private DatabaseManager.NotificationsManager databaseManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -61,12 +64,11 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_notifications, container, false);
 
+        this.databaseManager = new DatabaseManager.NotificationsManager(this, getContext());
+
         this.notifications = new ArrayList<>();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(this.activity.getLoggedUserId()));
-        DataRequest dataRequest = new DataRequest(params, NOTIFICATIONS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.notificationsRequest(this.activity.getLoggedUserId());
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_notifications);
         this.layoutManager = new LinearLayoutManager(this.getContext());
@@ -96,41 +98,15 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
     // endregion
 
-    // region 4. Loading data from php
+    // region 4. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        // Get notifications
-        try {
-            JSONArray jsonNotifications = new JSONArray(response);
-
-            for (int ind = 0; ind < jsonNotifications.length(); ind++) {
-                JSONObject jsonNotification = jsonNotifications.getJSONObject(ind);
-
-                int id = jsonNotification.getInt("id");
-                int userId = jsonNotification.getInt("user_id");
-                int postId = jsonNotification.getInt("post_id");
-                String username = jsonNotification.getString("username");
-                String image = jsonNotification.getString("image");
-                int type = jsonNotification.getInt("type");
-                boolean seen = jsonNotification.getBoolean("seen");
-
-                Notification notification;
-                if (postId == 0) {
-                    notification = new Notification(id, userId, username, image, type, seen);
-                } else {
-                    notification = new Notification(id, userId, postId, username, image, type, seen);
-                }
-
-                this.notifications.add(notification);
-                this.adapter.notifyItemInserted(this.notifications.size() - 1);
-            }
-
-            this.swipeRefreshLayout.setRefreshing(false);
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onNotificationsResponse(ArrayList<Notification> notifications) {
+        for (Notification notification : notifications) {
+            this.notifications.add(notification);
+            this.adapter.notifyItemInserted(this.notifications.size() - 1);
         }
-
+        this.swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -149,10 +125,7 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         this.adapter.notifyItemRangeRemoved(0, this.notifications.size());
         this.notifications.clear();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(this.activity.getLoggedUserId()));
-        DataRequest dataRequest = new DataRequest(params, NOTIFICATIONS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.notificationsRequest(this.activity.getLoggedUserId());
     }
 
     // endregion

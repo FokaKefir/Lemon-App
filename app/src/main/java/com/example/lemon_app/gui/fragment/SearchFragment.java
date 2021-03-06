@@ -19,6 +19,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.UserAdapter;
 import com.example.lemon_app.model.User;
@@ -35,13 +36,15 @@ import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.SEARCH_USERS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
-public class SearchFragment extends Fragment implements UserAdapter.OnUserListener, View.OnClickListener, Response.ErrorListener, Response.Listener<String> {
+public class SearchFragment extends Fragment implements UserAdapter.OnUserListener, View.OnClickListener, DatabaseManager.SearchManager.OnResponseListener {
 
     // region 1. Decl and Init
 
     private MainActivity activity;
 
     private View view;
+
+    private DatabaseManager.SearchManager databaseManager;
 
     private EditText txtName;
 
@@ -64,6 +67,8 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_search, container, false);
+
+        this.databaseManager = new DatabaseManager.SearchManager(this, getContext());
 
         this.users = new ArrayList<>();
 
@@ -92,11 +97,7 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
             this.users.clear();
 
             String name = this.txtName.getText().toString().trim();
-            Map<String, String> params = new HashMap<>();
-            params.put("name", name);
-            params.put("id", String.valueOf(this.activity.getLoggedUserId()));
-            DataRequest dataRequest = new DataRequest(params, SEARCH_USERS_REQUEST_URL, this, this);
-            Volley.newRequestQueue(getContext()).add(dataRequest);
+            this.databaseManager.search(name, this.activity.getLoggedUserId());
         }
     }
 
@@ -115,73 +116,34 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
 
     @Override
     public void onFollowListener(int id) {
-        Map<String, String> params = new HashMap<>();
-        params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("following_id", String.valueOf(id));
-        DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.followUser(this.activity.getLoggedUserId(), id);
     }
 
     @Override
     public void onUnfollowListener(int id) {
-        Map<String, String> params = new HashMap<>();
-        params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("following_id", String.valueOf(id));
-        DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.unfollowUser(this.activity.getLoggedUserId(), id);
     }
 
     // endregion
 
-    // region 5. Load data from php
+    // region 5. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        // Get followers
-        try {
-            JSONArray jsonFollowers = new JSONArray(response);
-
-            for (int ind = 0; ind < jsonFollowers.length(); ind++) {
-                JSONObject jsonFollower = jsonFollowers.getJSONObject(ind);
-
-                int id = jsonFollower.getInt("id");
-                String name = jsonFollower.getString("name");
-                String image = jsonFollower.getString("image");
-                boolean followed = jsonFollower.getBoolean("followed");
-
-                User follower = new User(id, image, name, followed);
-                this.users.add(follower);
-                this.adapter.notifyItemInserted(this.users.size() - 1);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onUsersResponse(ArrayList<User> users) {
+        for (User user : users) {
+            this.users.add(user);
+            this.adapter.notifyItemInserted(this.users.size() - 1);
         }
+    }
 
-        // Follow user
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean followed = jsonResponse.getBoolean("followed");
+    @Override
+    public void onFollowResponse(int id) {
+        follow(id);
+    }
 
-            if (followed) {
-                int id = jsonResponse.getInt("id");
-                follow(id);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        //Unfollow user
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean unfollowed = jsonResponse.getBoolean("unfollowed");
-
-            if (unfollowed) {
-                int id = jsonResponse.getInt("id");
-                unfollow(id);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onUnfollowResponse(int id) {
+        unfollow(id);
     }
 
     @Override

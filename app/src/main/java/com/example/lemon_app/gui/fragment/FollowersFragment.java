@@ -20,6 +20,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.UserAdapter;
 import com.example.lemon_app.model.User;
@@ -37,7 +38,7 @@ import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
-public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, Response.ErrorListener, Response.Listener<String>, SwipeRefreshLayout.OnRefreshListener {
+public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, SwipeRefreshLayout.OnRefreshListener, DatabaseManager.FollowersManager.OnResponseListener {
 
     // region 0. Constants
 
@@ -48,6 +49,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
     private MainActivity activity;
 
     private View view;
+
+    private DatabaseManager.FollowersManager databaseManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -79,14 +82,11 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
             this.type = getArguments().getBoolean("type");
         }
 
+        this.databaseManager = new DatabaseManager.FollowersManager(this, getContext());
+
         this.followers = new ArrayList<>();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("id", String.valueOf(this.userId));
-        params.put("followers", String.valueOf(this.type == FOLLOWERS));
-        DataRequest dataRequest = new DataRequest(params, FOLLOWERS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.followersRequest(this.activity.getLoggedUserId(), this.userId, this.type);
 
         this.txtFollowers = this.view.findViewById(R.id.txt_followers);
         if (this.type == FOLLOWERS)
@@ -121,75 +121,35 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
 
     @Override
     public void onFollowListener(int id) {
-        Map<String, String> params = new HashMap<>();
-        params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("following_id", String.valueOf(id));
-        DataRequest dataRequest = new DataRequest(params, FOLLOW_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.followUser(this.activity.getLoggedUserId(), id);
     }
 
     @Override
     public void onUnfollowListener(int id) {
-        Map<String, String> params = new HashMap<>();
-        params.put("follower_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("following_id", String.valueOf(id));
-        DataRequest dataRequest = new DataRequest(params, UNFOLLOW_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.unfollowUser(this.activity.getLoggedUserId(), id);
     }
 
     // endregion
 
-    // region 4. Load data from php
+    // region 4. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        // Get followers
-        try {
-            JSONArray jsonFollowers = new JSONArray(response);
-
-            for (int ind = 0; ind < jsonFollowers.length(); ind++) {
-                JSONObject jsonFollower = jsonFollowers.getJSONObject(ind);
-
-                int id = jsonFollower.getInt("id");
-                String name = jsonFollower.getString("name");
-                String image = jsonFollower.getString("image");
-                boolean followed = jsonFollower.getBoolean("followed");
-
-                User follower = new User(id, image, name, followed);
-                this.followers.add(follower);
-                this.adapter.notifyItemInserted(this.followers.size() - 1);
-            }
-
-            this.swipeRefreshLayout.setRefreshing(false);
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onFollowersResponse(ArrayList<User> followers) {
+        for (User follower : followers) {
+            this.followers.add(follower);
+            this.adapter.notifyItemInserted(this.followers.size() - 1);
         }
+        this.swipeRefreshLayout.setRefreshing(false);
+    }
 
-        // Follow user
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean followed = jsonResponse.getBoolean("followed");
+    @Override
+    public void onFollowResponse(int id) {
+        follow(id);
+    }
 
-            if (followed) {
-                int id = jsonResponse.getInt("id");
-                follow(id);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        //Unfollow user
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean unfollowed = jsonResponse.getBoolean("unfollowed");
-
-            if (unfollowed) {
-                int id = jsonResponse.getInt("id");
-                unfollow(id);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onUnfollowResponse(int id) {
+        unfollow(id);
     }
 
     @Override
@@ -246,12 +206,7 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
         this.adapter.notifyItemRangeRemoved(0, this.followers.size());
         this.followers.clear();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("logged_id", String.valueOf(this.activity.getLoggedUserId()));
-        params.put("id", String.valueOf(this.userId));
-        params.put("followers", String.valueOf(this.type == FOLLOWERS));
-        DataRequest dataRequest = new DataRequest(params, FOLLOWERS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.followersRequest(this.activity.getLoggedUserId(), this.userId, this.type);
     }
 
     // endregion

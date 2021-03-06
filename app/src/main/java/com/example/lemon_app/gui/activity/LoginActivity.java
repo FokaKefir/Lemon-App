@@ -33,8 +33,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // region 0. Constants
 
-
-
     public static final String NAME = "name";
     public static final String PASSWORD = "password";
     public static final String ACCESS = "access";

@@ -14,32 +14,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
+import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.CreatePostActivity;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.PostAdapter;
-import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.model.Post;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-import static com.example.lemon_app.constants.Constants.DELETE_POST_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.LIKE_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
-
-public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, Response.ErrorListener, Response.Listener<String>, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class PostsFragment extends Fragment implements PostAdapter.OnPostListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, DatabaseManager.PostsManager.OnResponseListener {
 
     // region 0. Constants
 
@@ -50,6 +37,8 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     private MainActivity activity;
 
     private View view;
+
+    private DatabaseManager.PostsManager databaseManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -74,15 +63,14 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_posts, container, false);
 
+        this.databaseManager = new DatabaseManager.PostsManager(this, getContext());
+
         this.fabAddPost = this.view.findViewById(R.id.fab_add_post);
         this.fabAddPost.setOnClickListener(this);
 
         this.posts = new ArrayList<>();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(this.activity.getLoggedUserId()));
-        DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.postsRequest(this.activity.getLoggedUserId());
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
@@ -121,28 +109,17 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     @Override
     public void onDeleteListener(int postId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(postId));
-        DataRequest dataRequest = new DataRequest(params, DELETE_POST_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.deletePost(postId);
     }
 
     @Override
     public void onLikeListener(int postId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("post_id", String.valueOf(postId));
-        params.put("user_id", String.valueOf(this.activity.getLoggedUserId()));
-        DataRequest dataRequest = new DataRequest(params, LIKE_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.likePost(postId, this.activity.getLoggedUserId());
     }
 
     @Override
     public void onUnlikeListener(int postId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("post_id", String.valueOf(postId));
-        params.put("user_id", String.valueOf(this.activity.getLoggedUserId()));
-        DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.unlikePost(postId, this.activity.getLoggedUserId());
     }
 
     // endregion
@@ -160,79 +137,30 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
     // endregion
 
-    // region 5. Loading posts from php
+    // region 5. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        // Get posts
-        try {
-            JSONArray jsonPosts = new JSONArray(response);
-
-            for (int ind = 0; ind < jsonPosts.length(); ind++) {
-                JSONObject jsonPost = jsonPosts.getJSONObject(ind);
-
-                int id = jsonPost.getInt("id");
-                int authorId = jsonPost.getInt("author_id");
-                String image = jsonPost.getString("image");
-                String author = jsonPost.getString("author");
-                String date = jsonPost.getString("date");
-                String description = jsonPost.getString("description");
-                int likes = jsonPost.getInt("likes");
-                int comments = jsonPost.getInt("comments");
-                boolean liked = jsonPost.getBoolean("liked");
-
-                Post post = new Post(id, authorId, image, author, date, description, likes, comments, liked);
-                this.posts.add(post);
-                this.adapter.notifyItemInserted(this.posts.size() - 1);
-            }
-
-            this.swipeRefreshLayout.setRefreshing(false);
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onPostsResponse(ArrayList<Post> posts) {
+        for (Post post : posts) {
+            this.posts.add(post);
+            this.adapter.notifyItemInserted(this.posts.size() - 1);
         }
+        this.swipeRefreshLayout.setRefreshing(false);
+    }
 
-        // Delete post
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean deleted = jsonResponse.getBoolean("deleted");
+    @Override
+    public void onDeletePostResponse(int deleteId) {
+        deletePost(deleteId);
+    }
 
-            if (deleted) {
-                int deleteId = jsonResponse.getInt("id");
-                deletePost(deleteId);
-            }
+    @Override
+    public void onLikePostResponse(int postId) {
+        likePost(postId);
+    }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // Like post
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean liked = jsonResponse.getBoolean("liked");
-
-            if (liked) {
-                int postId = jsonResponse.getInt("post_id");
-                likePost(postId);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        // Unlike
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean unliked = jsonResponse.getBoolean("unliked");
-
-            if (unliked) {
-                int postId = jsonResponse.getInt("post_id");
-                unlikePost(postId);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+    @Override
+    public void onUnlikePostResponse(int postId) {
+        unlikePost(postId);
     }
 
     @Override
@@ -336,10 +264,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         this.adapter.notifyItemRangeRemoved(0, this.posts.size());
         this.posts.clear();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(this.activity.getLoggedUserId()));
-        DataRequest dataRequest = new DataRequest(params, POSTS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.postsRequest(this.activity.getLoggedUserId());
     }
 
     // endregion

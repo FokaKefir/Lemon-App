@@ -20,6 +20,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.CommentAdapter;
 import com.example.lemon_app.model.Comment;
@@ -39,7 +40,7 @@ import static com.example.lemon_app.constants.Constants.DELETE_COMMENT_REQUEST_U
 import static com.example.lemon_app.constants.Constants.UPLOAD_COMMENT_REQUEST_URL;
 
 
-public class CommentsFragment extends Fragment implements CommentAdapter.OnCommentListener, View.OnClickListener, Response.Listener<String>, Response.ErrorListener, SwipeRefreshLayout.OnRefreshListener {
+public class CommentsFragment extends Fragment implements CommentAdapter.OnCommentListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener, DatabaseManager.CommentsManager.OnResponseListener {
 
     // region 0. Constants
 
@@ -50,6 +51,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     private MainActivity activity;
 
     private View view;
+
+    private DatabaseManager.CommentsManager databaseManager;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -84,16 +87,15 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.userId = this.activity.getLoggedUserId();
         this.strName = this.activity.getStrUser();
 
+        this.databaseManager = new DatabaseManager.CommentsManager(this, getContext(), this.postId);
+
         this.txtInputComment = this.view.findViewById(R.id.txt_new_comment);
         this.fabSend = this.view.findViewById(R.id.fab_send_comment);
         this.fabSend.setOnClickListener(this);
         
         this.comments = new ArrayList<>();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("post_id", String.valueOf(this.postId));
-        DataRequest dataRequest = new DataRequest(params, COMMENTS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.commentsRequest();
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_comments);
         this.layoutManager = new LinearLayoutManager(this.getContext());
@@ -122,11 +124,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
     @Override
     public void onDeleteListener(int commentId) {
-        Map<String, String> params = new HashMap<>();
-        params.put("id", String.valueOf(commentId));
-        params.put("post_id", String.valueOf(this.postId));
-        DataRequest dataRequest = new DataRequest(params, DELETE_COMMENT_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.deleteComment(commentId);
     }
 
     // endregion
@@ -142,59 +140,26 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
     
     // endregion
 
-    // region 5. Loading comments from php
+    // region 5. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        // Get comments
-        try {
-            JSONArray jsonComments = new JSONArray(response);
-
-            for (int ind = 0; ind < jsonComments.length(); ind++) {
-                JSONObject jsonComment= jsonComments.getJSONObject(ind);
-
-                int id = jsonComment.getInt("id");
-                int authorId = jsonComment.getInt("author_id");
-                String author = jsonComment.getString("author");
-                String text = jsonComment.getString("text");
-
-                Comment comment = new Comment(id, this.postId, authorId, author, text);
-                this.comments.add(comment);
-                this.adapter.notifyItemInserted(this.comments.size() - 1);
-            }
-
-            this.swipeRefreshLayout.setRefreshing(false);
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onCommentsResponse(ArrayList<Comment> comments) {
+        for (Comment comment : comments) {
+            this.comments.add(comment);
+            this.adapter.notifyItemInserted(this.comments.size() - 1);
         }
 
-        // Insert comment
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean uploaded = jsonResponse.getBoolean("uploaded");
+        this.swipeRefreshLayout.setRefreshing(false);
+    }
 
-            if (uploaded) {
-                int id = jsonResponse.getInt("id");
-                insertComment(id);
-            }
-        }catch (JSONException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onInsertCommentResponse(int id) {
+        insertComment(id);
+    }
 
-        // Delete comment
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean deleted = jsonResponse.getBoolean("deleted");
-
-            if (deleted) {
-                int deleteId = jsonResponse.getInt("id");
-                deleteComment(deleteId);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+    @Override
+    public void onDeleteCommentResponse(int deleteId) {
+        deleteComment(deleteId);
     }
 
     @Override
@@ -233,12 +198,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
 
         this.newComment = new Comment(this.postId, this.userId, this.strName, strComment);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("post_id", String.valueOf(this.postId));
-        params.put("user_id", String.valueOf(this.userId));
-        params.put("text", strComment);
-        DataRequest dataRequest = new DataRequest(params, UPLOAD_COMMENT_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.sendComment(this.userId, strComment);
     }
 
     // endregion
@@ -281,10 +241,7 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.adapter.notifyItemRangeRemoved(0, this.comments.size());
         this.comments.clear();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("post_id", String.valueOf(this.postId));
-        DataRequest dataRequest = new DataRequest(params, COMMENTS_REQUEST_URL, this, this);
-        Volley.newRequestQueue(getContext()).add(dataRequest);
+        this.databaseManager.commentsRequest();
     }
 
     // endregion
