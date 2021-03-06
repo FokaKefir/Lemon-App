@@ -121,6 +121,8 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
 
     // region 4. Getting response from php
 
+    // TODO complete DatabaseManager
+
     @Override
     public void onResponse(String response) {
         try {

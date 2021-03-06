@@ -9,6 +9,9 @@ public class Constants {
     // Shared Preferences constants
     public static final String SHARED_PREFS = "login";
 
+    // Token
+    public static final String TOKEN_SECRET = "lemon#is#lime";
+
     // Insert URLs
     public static final String REGISTER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/register.php";
     public static final String UPLOAD_IMAGE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/upload_image.php";
