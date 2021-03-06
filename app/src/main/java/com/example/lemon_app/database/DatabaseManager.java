@@ -1,13 +1,10 @@
 package com.example.lemon_app.database;
 
 import android.content.Context;
-import android.view.View;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.example.lemon_app.model.Comment;
 import com.example.lemon_app.model.Notification;
 import com.example.lemon_app.model.Post;
@@ -20,7 +17,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static com.example.lemon_app.constants.Constants.COMMENTS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.DELETE_COMMENT_REQUEST_URL;
@@ -37,6 +33,7 @@ import static com.example.lemon_app.constants.Constants.SEARCH_USERS_REQUEST_URL
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_COMMENT_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.UPLOAD_POST_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
 
 public class DatabaseManager {
@@ -844,6 +841,55 @@ public class DatabaseManager {
 
         public interface OnResponseListener {
             void onNotificationsResponse(ArrayList<Notification> notifications);
+            void onErrorResponse(VolleyError error);
+        }
+    }
+
+    // endregion
+
+    // region 9. Create post manager
+
+    public static class CreatePostManager implements Response.Listener<String>, Response.ErrorListener {
+
+        private OnResponseListener onResponseListener;
+        private Context context;
+
+        public CreatePostManager(OnResponseListener onResponseListener, Context context) {
+            this.onResponseListener = onResponseListener;
+            this.context = context;
+        }
+
+        public void uploadPost(int userId, String content, String image) {
+            Map<String, String> params = new HashMap<>();
+            params.put("user_id", String.valueOf(userId));
+            params.put("content", content);
+            params.put("image", image);
+            DataRequest dataRequest = new DataRequest(params, UPLOAD_POST_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        @Override
+        public void onResponse(String response) {
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                boolean success = jsonResponse.getBoolean("success");
+
+                if (success) {
+                    this.onResponseListener.onSuccessfulPostResponse();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            this.onResponseListener.onErrorResponse(error);
+        }
+
+
+        public interface OnResponseListener {
+            void onSuccessfulPostResponse();
             void onErrorResponse(VolleyError error);
         }
     }

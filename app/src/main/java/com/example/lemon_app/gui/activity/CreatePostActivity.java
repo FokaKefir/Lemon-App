@@ -24,6 +24,7 @@ import com.example.lemon_app.BuildConfig;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
 import com.example.lemon_app.database.DataRequest;
+import com.example.lemon_app.database.DatabaseManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -42,13 +43,15 @@ import static com.example.lemon_app.constants.Constants.IMAGE_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_IMAGE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_POST_REQUEST_URL;
 
-public class CreatePostActivity extends AppCompatActivity implements View.OnClickListener, Response.ErrorListener, Response.Listener<String> {
+public class CreatePostActivity extends AppCompatActivity implements View.OnClickListener, DatabaseManager.CreatePostManager.OnResponseListener {
 
     // region 0. Constants
 
     // endregion
 
     // region 1. Delc and Init
+
+    private DatabaseManager.CreatePostManager databaseManager;
 
     private TextInputLayout txtInputContent;
 
@@ -70,6 +73,8 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_create_post);
 
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
+
+        this.databaseManager = new DatabaseManager.CreatePostManager(this, this);
 
         this.filePath = null;
         this.image = "";
@@ -119,28 +124,14 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
 
     // endregion
 
-    // region 4. Getting response from php
-
-    // TODO complete DatabaseManager
+    // region 4. Database manager listener
 
     @Override
-    public void onResponse(String response) {
-        try {
-            JSONObject jsonResponse = new JSONObject(response);
-            boolean success = jsonResponse.getBoolean("success");
-
-            if (success) {
-                if (!this.image.equals("")) {
-                    uploadImage();
-                }
-                finish();
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void onSuccessfulPostResponse() {
+        if (!this.image.equals("")) {
+            uploadImage();
         }
-
-
+        finish();
     }
 
     @Override
@@ -217,12 +208,7 @@ public class CreatePostActivity extends AppCompatActivity implements View.OnClic
             return;
         }
 
-        Map<String, String> params = new HashMap<>();
-        params.put("user_id", String.valueOf(this.userId));
-        params.put("content", strContent);
-        params.put("image", strImage);
-        DataRequest dataRequest = new DataRequest(params, UPLOAD_POST_REQUEST_URL, this, this);
-        Volley.newRequestQueue(CreatePostActivity.this).add(dataRequest);
+        this.databaseManager.uploadPost(this.userId, strContent, strImage);
     }
 
     private void uploadImage() {
