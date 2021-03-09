@@ -210,9 +210,10 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.comments.add(this.newComment);
         this.adapter.notifyItemInserted(this.comments.size() - 1);
         this.txtInputComment.getEditText().setText("");
-        sendNotification();
 
         this.activity.refreshComment(this, this.postId, Constants.REFRESH_TYPE_INSERT_COMMENT);
+
+        this.databaseManager.sendNotificationComment(this.activity.getLoggedUserId(), id);
     }
 
     private void deleteComment(int deleteId) {
@@ -228,6 +229,8 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
             this.adapter.notifyItemRemoved(ind);
 
             this.activity.refreshComment(this, this.postId, Constants.REFRESH_TYPE_DELETE_COMMENT);
+
+            this.databaseManager.deleteNotificationComment(deleteId);
         }
     }
 
@@ -242,14 +245,6 @@ public class CommentsFragment extends Fragment implements CommentAdapter.OnComme
         this.comments.clear();
 
         this.databaseManager.commentsRequest();
-    }
-
-    // endregion
-
-    // region 10. Sending notification to php
-
-    private void sendNotification() {
-        // TODO send notification
     }
 
     // endregion

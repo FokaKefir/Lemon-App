@@ -19,11 +19,13 @@ public class Constants {
     public static final String UPLOAD_COMMENT_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/upload_comment.php";
     public static final String LIKE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/like.php";
     public static final String FOLLOW_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/follow.php";
+    public static final String SEND_NOTIFICATION_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/insert/send_notification.php";
 
     // Select URLs
     public static final String COMMENTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/comments.php";
     public static final String LOGIN_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/login.php";
     public static final String POSTS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/posts.php";
+    public static final String POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/post.php";
     public static final String USER_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/user.php";
     public static final String FOLLOWERS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/followers.php";
     public static final String SEARCH_USERS_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/select/search_users.php";
@@ -34,8 +36,10 @@ public class Constants {
     public static final String DELETE_POST_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_post.php";
     public static final String UNLIKE_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/unlike.php";
     public static final String UNFOLLOW_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/unfollow.php";
+    public static final String DELETE_NOTIFICATION_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/delete/delete_notification.php";
 
     // Update URLs
+    public static final String UPDATE_NOTIFICATION_REQUEST_URL = "http://fokakefir.go.ro/lemon_app/php/update/update_notification.php";
 
     // Image URL
     public static final String IMAGE_URL = "http://fokakefir.go.ro/lemon_app/images/";

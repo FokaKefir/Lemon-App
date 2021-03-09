@@ -49,6 +49,7 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
     private FloatingActionButton fabAddPost;
 
     private ArrayList<Post> posts;
+    private int postId;
 
     // endregion
 
@@ -70,7 +71,14 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
 
         this.posts = new ArrayList<>();
 
-        this.databaseManager.postsRequest(this.activity.getLoggedUserId());
+        if (getArguments() != null) {
+            this.postId = getArguments().getInt("post_id");
+            this.databaseManager.postRequest(this.postId, this.activity.getLoggedUserId());
+            this.fabAddPost.setVisibility(View.GONE);
+        } else {
+            this.databaseManager.postsRequest(this.activity.getLoggedUserId());
+            this.postId = 0;
+        }
 
         this.recyclerView = this.view.findViewById(R.id.recycler_view_posts);
         this.layoutManager = new LinearLayoutManager(this.getContext());
@@ -184,6 +192,9 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         if (ind != -1) {
             this.posts.remove(ind);
             this.adapter.notifyItemRemoved(ind);
+            if (this.postId != 0){
+                this.activity.removeFromFragments();
+            }
         }
     }
 
@@ -199,10 +210,10 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.increaseLikes();
             this.posts.set(ind, post);
             this.adapter.notifyItemChanged(ind);
-            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_LIKE);
-            // TODO send notification
+
+            this.databaseManager.sendNotificationLike(this.activity.getLoggedUserId(), postId);
         }
     }
 
@@ -214,9 +225,10 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             post.decreaseLikes();
             this.posts.set(ind, post);
             this.adapter.notifyItemChanged(ind);
-            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_UNLIKE);
+
+            this.databaseManager.deleteNotificationLike(this.activity.getLoggedUserId(), postId);
         }
     }
 
@@ -233,14 +245,12 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
                 post.increaseLikes();
                 this.posts.set(ind, post);
                 this.adapter.notifyItemChanged(ind);
-                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             } else if (type == Constants.REFRESH_TYPE_UNLIKE) {
                 Post post = this.posts.get(ind);
                 post.setLiked(false);
                 post.decreaseLikes();
                 this.posts.set(ind, post);
                 this.adapter.notifyItemChanged(ind);
-                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             }
         }
     }
@@ -254,7 +264,6 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
             else if (type == Constants.REFRESH_TYPE_DELETE_COMMENT)
                 post.decreaseComments();
             this.adapter.notifyItemChanged(ind);
-            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
         }
     }
 
@@ -264,7 +273,11 @@ public class PostsFragment extends Fragment implements PostAdapter.OnPostListene
         this.adapter.notifyItemRangeRemoved(0, this.posts.size());
         this.posts.clear();
 
-        this.databaseManager.postsRequest(this.activity.getLoggedUserId());
+        if (this.postId != 0) {
+            this.databaseManager.postRequest(this.postId, this.activity.getLoggedUserId());
+        } else {
+            this.databaseManager.postsRequest(this.activity.getLoggedUserId());
+        }
     }
 
     // endregion

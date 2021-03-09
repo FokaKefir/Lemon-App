@@ -280,9 +280,10 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
             post.increaseLikes();
             this.posts.set(ind, post);
             this.adapter.notifyItemChanged(ind);
-            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_LIKE);
+
+            this.databaseManager.sendNotificationLike(this.activity.getLoggedUserId(), postId);
         }
     }
 
@@ -294,9 +295,10 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
             post.decreaseLikes();
             this.posts.set(ind, post);
             this.adapter.notifyItemChanged(ind);
-            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             this.activity.refreshLike(this, postId, Constants.REFRESH_TYPE_UNLIKE);
+
+            this.databaseManager.deleteNotificationLike(this.activity.getLoggedUserId(), postId);
         }
     }
 
@@ -312,7 +314,8 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
 
         this.activity.refreshFollow(this, this.userId, Constants.REFRESH_TYPE_FOLLOW);
-        // TODO send notification
+
+        this.databaseManager.sendNotificationFollow(this.activity.getLoggedUserId(), this.userId);
     }
 
     @SuppressLint("SetTextI18n")
@@ -323,6 +326,8 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
         this.txtFollowers.setText(this.userFollowers + "\nfollowers");
 
         this.activity.refreshFollow(this, this.userId, Constants.REFRESH_TYPE_UNFOLLOW);
+
+        this.databaseManager.deleteNotificationFollow(this.activity.getLoggedUserId(), this.userId);
     }
 
     // endregion
@@ -355,7 +360,6 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
                 post.increaseLikes();
                 this.posts.set(ind, post);
                 this.adapter.notifyItemChanged(ind);
-                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
 
             } else if (type == Constants.REFRESH_TYPE_UNLIKE) {
                 Post post = this.posts.get(ind);
@@ -363,7 +367,6 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
                 post.decreaseLikes();
                 this.posts.set(ind, post);
                 this.adapter.notifyItemChanged(ind);
-                //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
             }
         }
     }
@@ -378,7 +381,6 @@ public class UserFragment extends PostsFragment implements View.OnClickListener,
                 post.decreaseComments();
 
             this.adapter.notifyItemChanged(ind);
-            //this.adapter.onBindViewHolder(this.adapter.getMyHolder(ind), ind);
         }
     }
 

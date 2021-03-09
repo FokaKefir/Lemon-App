@@ -14,29 +14,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
-import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.UserAdapter;
 import com.example.lemon_app.model.User;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.FOLLOWERS;
-import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
 public class FollowersFragment extends Fragment implements UserAdapter.OnUserListener, SwipeRefreshLayout.OnRefreshListener, DatabaseManager.FollowersManager.OnResponseListener {
 
@@ -169,7 +157,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
             this.adapter.notifyItemChanged(ind);
 
             this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_FOLLOW);
-            // TODO send notification
+
+            this.databaseManager.sendNotificationFollow(this.activity.getLoggedUserId(), id);
         }
     }
 
@@ -180,6 +169,8 @@ public class FollowersFragment extends Fragment implements UserAdapter.OnUserLis
             this.adapter.notifyItemChanged(ind);
 
             this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_UNFOLLOW);
+
+            this.databaseManager.deleteNotificationFollow(this.activity.getLoggedUserId(), id);
         }
     }
 

@@ -56,6 +56,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         holder.id = currentNotification.getId();
         holder.userId = currentNotification.getUserId();
+        holder.type = currentNotification.getType();
         holder.txtUserName.setText(currentNotification.getUsername());
 
         switch (currentNotification.getType()) {
@@ -99,6 +100,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         public int id;
         public int userId;
         public int postId;
+        public int type;
         public ImageView imgUser;
         public TextView txtUserName;
         public TextView txtMessage;
@@ -134,8 +136,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 } else {
                     this.onNotificationListener.onUserClick(this.userId);
                 }
+                this.onNotificationListener.onClick(this.id);
             } else if (view.getId() == R.id.txt_example_notification_username) {
                 this.onNotificationListener.onUserClick(this.userId);
+                if (this.type == Notification.TYPE_FOLLOW)
+                    this.onNotificationListener.onClick(id);
             }
         }
     }
@@ -147,6 +152,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public interface OnNotificationListener {
         void onUserClick(int userId);
         void onPostClick(int postId);
+        void onClick(int notificationId);
     }
 
     // endregion

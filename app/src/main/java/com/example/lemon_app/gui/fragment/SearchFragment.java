@@ -13,28 +13,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import com.example.lemon_app.R;
 import com.example.lemon_app.constants.Constants;
-import com.example.lemon_app.database.DataRequest;
 import com.example.lemon_app.database.DatabaseManager;
 import com.example.lemon_app.gui.activity.MainActivity;
 import com.example.lemon_app.gui.recyclerview.UserAdapter;
 import com.example.lemon_app.model.User;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.example.lemon_app.constants.Constants.FOLLOW_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.SEARCH_USERS_REQUEST_URL;
-import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 
 public class SearchFragment extends Fragment implements UserAdapter.OnUserListener, View.OnClickListener, DatabaseManager.SearchManager.OnResponseListener {
 
@@ -162,7 +149,8 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
             this.adapter.notifyItemChanged(ind);
 
             this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_FOLLOW);
-            // TODO send notification
+
+            this.databaseManager.sendNotificationFollow(this.activity.getLoggedUserId(), id);
         }
     }
 
@@ -173,6 +161,8 @@ public class SearchFragment extends Fragment implements UserAdapter.OnUserListen
             this.adapter.notifyItemChanged(ind);
 
             this.activity.refreshFollow(this, id, Constants.REFRESH_TYPE_UNFOLLOW);
+
+            this.databaseManager.deleteNotificationFollow(this.activity.getLoggedUserId(), id);
         }
     }
 

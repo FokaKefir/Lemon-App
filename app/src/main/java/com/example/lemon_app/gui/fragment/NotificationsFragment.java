@@ -88,12 +88,25 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
 
     @Override
     public void onUserClick(int userId) {
-        Toast.makeText(activity, String.valueOf(userId), Toast.LENGTH_SHORT).show();
+        Fragment userFragment = new UserFragment(this.activity);
+        Bundle args = new Bundle();
+        args.putInt("user_id", userId);
+        userFragment.setArguments(args);
+        this.activity.addToFragments(userFragment);
     }
 
     @Override
     public void onPostClick(int postId) {
-        Toast.makeText(activity, String.valueOf(postId), Toast.LENGTH_SHORT).show();
+        Fragment postsFragment = new PostsFragment(this.activity);
+        Bundle args = new Bundle();
+        args.putInt("post_id", postId);
+        postsFragment.setArguments(args);
+        this.activity.addToFragments(postsFragment);
+    }
+
+    @Override
+    public void onClick(int notificationId) {
+        this.databaseManager.updateNotificationSeen(notificationId);
     }
 
     // endregion
@@ -107,6 +120,16 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
             this.adapter.notifyItemInserted(this.notifications.size() - 1);
         }
         this.swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onNotificationUpdatedResponse(int id) {
+        int ind = getIndById(id);
+        if (ind != -1) {
+            Notification notification = this.notifications.get(ind);
+            notification.setSeen(true);
+            this.adapter.notifyItemChanged(ind);
+        }
     }
 
     @Override
@@ -126,6 +149,21 @@ public class NotificationsFragment extends Fragment implements NotificationAdapt
         this.notifications.clear();
 
         this.databaseManager.notificationsRequest(this.activity.getLoggedUserId());
+    }
+
+    // endregion
+
+    // region 6. Getters and Setters
+
+    private int getIndById(int id) {
+        int ind = -1;
+        for (int i = 0; i < this.notifications.size(); i++) {
+            if (this.notifications.get(i).getId() == id) {
+                ind = i;
+                break;
+            }
+        }
+        return ind;
     }
 
     // endregion

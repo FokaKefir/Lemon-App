@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static com.example.lemon_app.constants.Constants.COMMENTS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.DELETE_COMMENT_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.DELETE_NOTIFICATION_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.DELETE_POST_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS;
 import static com.example.lemon_app.constants.Constants.FOLLOWERS_REQUEST_URL;
@@ -28,10 +29,13 @@ import static com.example.lemon_app.constants.Constants.LIKE_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.LOGIN_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.NOTIFICATIONS_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.POSTS_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.POST_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.REGISTER_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.SEARCH_USERS_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.SEND_NOTIFICATION_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNFOLLOW_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UNLIKE_REQUEST_URL;
+import static com.example.lemon_app.constants.Constants.UPDATE_NOTIFICATION_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_COMMENT_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.UPLOAD_POST_REQUEST_URL;
 import static com.example.lemon_app.constants.Constants.USER_REQUEST_URL;
@@ -163,6 +167,14 @@ public class DatabaseManager {
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
 
+        public void postRequest(int postId, int userId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("post_id", String.valueOf(postId));
+            params.put("user_id", String.valueOf(userId));
+            DataRequest dataRequest = new DataRequest(params, POST_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
         public void deletePost(int postId) {
             Map<String, String> params = new HashMap<>();
             params.put("id", String.valueOf(postId));
@@ -183,6 +195,24 @@ public class DatabaseManager {
             params.put("post_id", String.valueOf(postId));
             params.put("user_id", String.valueOf(userId));
             DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void sendNotificationLike(int fromId, int postId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("post_id", String.valueOf(postId));
+            params.put("type", String.valueOf(Notification.TYPE_LIKE));
+            DataRequest dataRequest = new DataRequest(params, SEND_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void deleteNotificationLike(int fromId, int postId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("post_id", String.valueOf(postId));
+            params.put("type", String.valueOf(Notification.TYPE_LIKE));
+            DataRequest dataRequest = new DataRequest(params, DELETE_NOTIFICATION_REQUEST_URL, this, this);
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
 
@@ -312,6 +342,24 @@ public class DatabaseManager {
             DataRequest dataRequest = new DataRequest(params, DELETE_COMMENT_REQUEST_URL, this, this);
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
+
+        public void sendNotificationComment(int fromId, int commentId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("post_id", String.valueOf(this.postId));
+            params.put("comment_id", String.valueOf(commentId));
+            params.put("type", String.valueOf(Notification.TYPE_COMMENT));
+            DataRequest dataRequest = new DataRequest(params, SEND_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void deleteNotificationComment(int commentId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("comment_id", String.valueOf(commentId));
+            params.put("type", String.valueOf(Notification.TYPE_COMMENT));
+            DataRequest dataRequest = new DataRequest(params, DELETE_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
         
         @Override
         public void onResponse(String response) {
@@ -438,6 +486,44 @@ public class DatabaseManager {
             params.put("post_id", String.valueOf(postId));
             params.put("user_id", String.valueOf(userId));
             DataRequest dataRequest = new DataRequest(params, UNLIKE_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void sendNotificationFollow(int fromId, int toId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("to_id", String.valueOf(toId));
+            params.put("post_id", "0");
+            params.put("comment_id", "0");
+            params.put("type", String.valueOf(Notification.TYPE_FOLLOW));
+            DataRequest dataRequest = new DataRequest(params, SEND_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void deleteNotificationFollow(int fromId, int toId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("type", String.valueOf(Notification.TYPE_FOLLOW));
+            params.put("from_id", String.valueOf(fromId));
+            params.put("to_id", String.valueOf(toId));
+            DataRequest dataRequest = new DataRequest(params, DELETE_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void sendNotificationLike(int fromId, int postId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("post_id", String.valueOf(postId));
+            params.put("type", String.valueOf(Notification.TYPE_LIKE));
+            DataRequest dataRequest = new DataRequest(params, SEND_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void deleteNotificationLike(int fromId, int postId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("post_id", String.valueOf(postId));
+            params.put("type", String.valueOf(Notification.TYPE_LIKE));
+            DataRequest dataRequest = new DataRequest(params, DELETE_NOTIFICATION_REQUEST_URL, this, this);
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
 
@@ -611,6 +697,26 @@ public class DatabaseManager {
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
 
+        public void sendNotificationFollow(int fromId, int toId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("to_id", String.valueOf(toId));
+            params.put("post_id", "0");
+            params.put("comment_id", "0");
+            params.put("type", String.valueOf(Notification.TYPE_FOLLOW));
+            DataRequest dataRequest = new DataRequest(params, SEND_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void deleteNotificationFollow(int fromId, int toId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("type", String.valueOf(Notification.TYPE_FOLLOW));
+            params.put("from_id", String.valueOf(fromId));
+            params.put("to_id", String.valueOf(toId));
+            DataRequest dataRequest = new DataRequest(params, DELETE_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
         @Override
         public void onResponse(String response) {
             // Get followers
@@ -713,6 +819,26 @@ public class DatabaseManager {
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
 
+        public void sendNotificationFollow(int fromId, int toId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("from_id", String.valueOf(fromId));
+            params.put("to_id", String.valueOf(toId));
+            params.put("post_id", "0");
+            params.put("comment_id", "0");
+            params.put("type", String.valueOf(Notification.TYPE_FOLLOW));
+            DataRequest dataRequest = new DataRequest(params, SEND_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
+        public void deleteNotificationFollow(int fromId, int toId) {
+            Map<String, String> params = new HashMap<>();
+            params.put("type", String.valueOf(Notification.TYPE_FOLLOW));
+            params.put("from_id", String.valueOf(fromId));
+            params.put("to_id", String.valueOf(toId));
+            DataRequest dataRequest = new DataRequest(params, DELETE_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
         @Override
         public void onResponse(String response) {
             // Get followers
@@ -799,6 +925,13 @@ public class DatabaseManager {
             Volley.newRequestQueue(this.context).add(dataRequest);
         }
 
+        public void updateNotificationSeen(int id) {
+            Map<String, String> params = new HashMap<>();
+            params.put("id", String.valueOf(id));
+            DataRequest dataRequest = new DataRequest(params, UPDATE_NOTIFICATION_REQUEST_URL, this, this);
+            Volley.newRequestQueue(this.context).add(dataRequest);
+        }
+
         @Override
         public void onResponse(String response) {
             // Get notifications
@@ -832,6 +965,20 @@ public class DatabaseManager {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            // Update
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                boolean updated = jsonResponse.getBoolean("updated");
+
+                if (updated) {
+                    int id = jsonResponse.getInt("id");
+                    this.onResponseListener.onNotificationUpdatedResponse(id);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
 
         @Override
@@ -841,6 +988,7 @@ public class DatabaseManager {
 
         public interface OnResponseListener {
             void onNotificationsResponse(ArrayList<Notification> notifications);
+            void onNotificationUpdatedResponse(int id);
             void onErrorResponse(VolleyError error);
         }
     }

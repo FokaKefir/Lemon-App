@@ -75,6 +75,10 @@ public class Notification {
         return seen;
     }
 
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
     // endregion
 
 }
